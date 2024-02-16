@@ -42,7 +42,7 @@ class QRDetector(Node):
 
         # Internal status
         self.last_compressed_image = CompressedImage()  # last CompressedImage received from the camera
-        self.qr_content = "00000"                            # content of the last detected QR
+        self.qr_content = ""                            # content of the last detected QR
 
         self.get_logger().info("Node init complete.")
 
