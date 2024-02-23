@@ -29,6 +29,7 @@ setup(
         'console_scripts': [
             'python_executable_name = pkg_name.python_executable_name:main',
             'QR_detector = tank.QR_detector:main',
+            'minimal_publisher = tank.minimal_publisher:main',
             ],
 
     },
