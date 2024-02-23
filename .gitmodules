@@ -1,3 +1,0 @@
-[submodule "ros2_ws/src/extended_pkgs/micro-ROS-Agent"]
-	path = ros2_ws/src/extended_pkgs/micro-ROS-Agent
-	url = https://github.com/micro-ROS/micro-ROS-Agent.git
