@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  # Base image containing dependencies.
+  base:
+    build: .
+    # Interactive shell
+    stdin_open: true
+    tty: true
+    # Networking and IPC for ROS
+    network_mode: host
+    ipc: host
+    # Needed to display graphical applications
+    privileged: true
+    environment:
+      # Allows graphical programs in the container.
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    volumes:
+      # Allows graphical programs in the container.
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${XAUTHORITY:-$HOME/.Xauthority}:/root/.Xauthority
+      # Mount the source code
+      - ./ros2_ws/src:/workspace/src
+      - /dev/bus/usb:/dev/bus/usb
+    command: bash -c "
+      source /workspace/install/setup.sh &&
+      sleep infinity"
