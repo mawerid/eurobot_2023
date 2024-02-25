@@ -17,7 +17,7 @@ class MinimalPublisher(Node):
         msg.data = self.i
         self.publisher_.publish(msg)
         #self.get_logger().info('Publishing: "%s"' % msg.data)
-        if self.i == 625:
+        if self.i == 500:
             self.i = 0
         else:
             self.i = 500
