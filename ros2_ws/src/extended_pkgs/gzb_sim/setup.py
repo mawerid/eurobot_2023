@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 import os
 from glob import glob
 
-package_name = 'tank'
+package_name = 'gzb_sim'
 
 setup(
     name=package_name,
@@ -15,23 +15,23 @@ setup(
         (os.path.join('share', package_name, 'launch/'), glob('launch/*.launch.py')),
         (os.path.join('share', package_name, 'urdf/'), glob('urdf/*.urdf')),
         (os.path.join('share', package_name, 'rviz/'), glob('rviz/*.rviz')),
+        (os.path.join('share', package_name, 'world/'), glob('world/*.sdf')),
         (os.path.join('share', package_name, 'meshes/'), glob('meshes/*.STL')),
-        (os.path.join('share', package_name, 'config/'), glob('config/*.yaml')),
+        (os.path.join('share', package_name, 'world/Arena/meshes/'), glob('world/Arena/meshes/*.dae')),
+        (os.path.join('share', package_name, 'world/Arena/meshes/'), glob('world/Arena/meshes/*.png')),
+        (os.path.join('share', package_name, 'world/plant/meshes/'), glob('world/plant/meshes/*.png')),
+        (os.path.join('share', package_name, 'world/plant/meshes/'), glob('world/plant/meshes/*.dae')),
+        (os.path.join('share', package_name, 'world/pot/meshes/'), glob('world/pot/meshes/*.dae')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='pi',
-    maintainer_email='pi@todo.todo',
+    maintainer_email='TManshin@yandex.ru',
     description='TODO: Package description',
     license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'QR_detector = tank.QR_detector:main',
-            'minimal_publisher = tank.minimal_publisher:main',
-            'ArUco = tank.ArUco:main',
-            'reboot = tank.reboot:main',
-            ],
-
+        ],
     },
 )

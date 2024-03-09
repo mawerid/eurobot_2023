@@ -30,8 +30,8 @@ def generate_launch_description():
 
         DeclareLaunchArgument(
             name='base_serial_port', 
-            #default_value='/dev/ttyACM0',
-            default_value='/dev/ttyS0',
+            default_value='/dev/ttyACM0',
+            #default_value='/dev/ttyS0',
             description='Tank Base Serial Port'
         ),
 
@@ -60,8 +60,4 @@ def generate_launch_description():
             }.items()
         ),
 
-        ##IncludeLaunchDescription(
-          ##  PythonLaunchDescriptionSource(custom_robot_launch_path),
-           ## condition=IfCondition(LaunchConfiguration("custom_robot")),
-        #)
     ])
