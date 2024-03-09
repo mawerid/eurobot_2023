@@ -31,8 +31,8 @@ class ArUcoDetection(Node):
         self.distortion = np.array([self.distCoeffs[0], self.distCoeffs[1], self.distCoeffs[2], self.distCoeffs[3]])
 
         self.cap = cv2.VideoCapture(0)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1280)
 
         self.create_timer(0.1, self.image_callback)
 

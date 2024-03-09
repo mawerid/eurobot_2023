@@ -60,8 +60,4 @@ def generate_launch_description():
             }.items()
         ),
 
-        ##IncludeLaunchDescription(
-          ##  PythonLaunchDescriptionSource(custom_robot_launch_path),
-           ## condition=IfCondition(LaunchConfiguration("custom_robot")),
-        #)
     ])

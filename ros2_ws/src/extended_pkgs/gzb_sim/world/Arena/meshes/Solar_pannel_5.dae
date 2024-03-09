@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <asset>
+    <contributor>
+      <author>Blender User</author>
+      <authoring_tool>Blender 4.0.2 commit date:2023-12-05, commit time:07:41, hash:9be62e85b727</authoring_tool>
+    </contributor>
+    <created>2024-02-29T00:19:35</created>
+    <modified>2024-02-29T00:19:35</modified>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_cameras>
+    <camera id="Camera-camera" name="Camera">
+      <optics>
+        <technique_common>
+          <perspective>
+            <xfov sid="xfov">39.59775</xfov>
+            <aspect_ratio>1.777778</aspect_ratio>
+            <znear sid="znear">0.1</znear>
+            <zfar sid="zfar">100</zfar>
+          </perspective>
+        </technique_common>
+      </optics>
+      <extra>
+        <technique profile="blender">
+          <shiftx sid="shiftx" type="float">0</shiftx>
+          <shifty sid="shifty" type="float">0</shifty>
+          <dof_distance sid="dof_distance" type="float">10</dof_distance>
+        </technique>
+      </extra>
+    </camera>
+  </library_cameras>
+  <library_lights>
+    <light id="Light-light" name="Light">
+      <technique_common>
+        <point>
+          <color sid="color">1000 1000 1000</color>
+          <constant_attenuation>1</constant_attenuation>
+          <linear_attenuation>0</linear_attenuation>
+          <quadratic_attenuation>0</quadratic_attenuation>
+        </point>
+      </technique_common>
+      <extra>
+        <technique profile="blender">
+          <type sid="type" type="int">0</type>
+          <flag sid="flag" type="int">0</flag>
+          <mode sid="mode" type="int">1</mode>
+          <red sid="red" type="float">1</red>
+          <green sid="green" type="float">1</green>
+          <blue sid="blue" type="float">1</blue>
+          <shadow_r sid="blender_shadow_r" type="float">0</shadow_r>
+          <shadow_g sid="blender_shadow_g" type="float">0</shadow_g>
+          <shadow_b sid="blender_shadow_b" type="float">0</shadow_b>
+          <energy sid="blender_energy" type="float">1000</energy>
+          <spotsize sid="spotsize" type="float">75</spotsize>
+          <spotblend sid="spotblend" type="float">0.15</spotblend>
+          <clipsta sid="clipsta" type="float">0.04999995</clipsta>
+          <clipend sid="clipend" type="float">30.002</clipend>
+          <bias sid="bias" type="float">1</bias>
+          <radius sid="radius" type="float">0.1</radius>
+          <area_shape sid="area_shape" type="int">1</area_shape>
+          <area_size sid="area_size" type="float">0.1</area_size>
+          <area_sizey sid="area_sizey" type="float">0.1</area_sizey>
+          <area_sizez sid="area_sizez" type="float">1</area_sizez>
+        </technique>
+      </extra>
+    </light>
+  </library_lights>
+  <library_effects>
+    <effect id="Solar_pannel_5-effect">
+      <profile_COMMON>
+        <newparam sid="node0_make_png-surface">
+          <surface type="2D">
+            <init_from>node0_make_png</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="node0_make_png-sampler">
+          <sampler2D>
+            <source>node0_make_png-surface</source>
+          </sampler2D>
+        </newparam>
+        <technique sid="common">
+          <lambert>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <diffuse>
+              <texture texture="node0_make_png-sampler" texcoord="UVКарта"/>
+            </diffuse>
+            <index_of_refraction>
+              <float sid="ior">1.45</float>
+            </index_of_refraction>
+          </lambert>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_images>
+    <image id="node0_make_png" name="node0_make_png">
+      <init_from>node0_make.png</init_from>
+    </image>
+  </library_images>
+  <library_materials>
+    <material id="Solar_pannel_5-material" name="Solar_pannel_5">
+      <instance_effect url="#Solar_pannel_5-effect"/>
+    </material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="Solar_pannel_5-mesh" name="Solar_pannel_5">
+      <mesh>
+        <source id="Solar_pannel_5-mesh-positions">
+          <float_array id="Solar_pannel_5-mesh-positions-array" count="222">-5e-5 -5.01588e-5 -5e-6 -5e-5 -5.01588e-5 0 -5e-5 4.98411e-5 -5e-6 -5e-5 4.98411e-5 0 -1.5e-5 -1.51589e-5 -3.4e-5 -1.5e-5 -1.51589e-5 -5e-6 -1.5e-5 1.34115e-6 -3.4e-5 -1.5e-5 4.48412e-5 -5e-6 -1.43924e-5 -1.93848e-5 -3.4e-5 -1.43924e-5 -1.93848e-5 -5e-6 -1.26188e-5 -2.32685e-5 -3.4e-5 -1.26188e-5 -2.32685e-5 -5e-6 -9.82291e-6 -2.64951e-5 -3.4e-5 -9.82291e-6 -2.64951e-5 -5e-6 -6.35085e-6 -1.51589e-5 -1.75e-5 -6.35085e-6 -1.51589e-5 0 -6.23122e-6 -2.88033e-5 -3.4e-5 -6.23122e-6 -2.88033e-5 -5e-6 -3.25e-6 -1.51589e-5 -3.4e-5 -3.25e-6 -1.51589e-5 -1.75e-5 -3.17543e-6 -2.06589e-5 -1.75e-5 -3.17543e-6 -2.06589e-5 0 -3.17543e-6 -9.65885e-6 -1.75e-5 -3.17543e-6 -9.65885e-6 0 -2.81458e-6 -1.67839e-5 -3.4e-5 -2.81458e-6 -1.67839e-5 -1.75e-5 -2.81458e-6 -1.35338e-5 -3.4e-5 -2.81458e-6 -1.35338e-5 -1.75e-5 -2.13472e-6 -3.00062e-5 -3.4e-5 -2.13472e-6 -3.00062e-5 -5e-6 -1.625e-6 -1.79734e-5 -3.4e-5 -1.625e-6 -1.79734e-5 -1.75e-5 -1.625e-6 -1.23443e-5 -3.4e-5 -1.625e-6 -1.23443e-5 -1.75e-5 0 -1.84088e-5 -1.75e-5 0 -1.84088e-5 -3.4e-5 0 -1.84088e-5 -1.75e-5 0 -1.84088e-5 -3.4e-5 0 -1.19088e-5 -3.4e-5 0 -1.19088e-5 -1.75e-5 1.625e-6 -1.79734e-5 -3.4e-5 1.625e-6 -1.79734e-5 -1.75e-5 1.625e-6 -1.23443e-5 -3.4e-5 1.625e-6 -1.23443e-5 -1.75e-5 2.13472e-6 -3.00062e-5 -3.4e-5 2.13472e-6 -3.00062e-5 -5e-6 2.81458e-6 -1.67839e-5 -3.4e-5 2.81458e-6 -1.67839e-5 -1.75e-5 2.81458e-6 -1.35338e-5 -3.4e-5 2.81458e-6 -1.35338e-5 -1.75e-5 3.17543e-6 -2.06589e-5 -1.75e-5 3.17543e-6 -2.06589e-5 0 3.17543e-6 -9.65885e-6 -1.75e-5 3.17543e-6 -9.65885e-6 0 3.25e-6 -1.51589e-5 -3.4e-5 3.25e-6 -1.51589e-5 -1.75e-5 6.23122e-6 -2.88033e-5 -3.4e-5 6.23122e-6 -2.88033e-5 -5e-6 6.35085e-6 -1.51589e-5 -1.75e-5 6.35085e-6 -1.51589e-5 0 9.82291e-6 -2.64951e-5 -3.4e-5 9.82291e-6 -2.64951e-5 -5e-6 1.26188e-5 -2.32685e-5 -3.4e-5 1.26188e-5 -2.32685e-5 -5e-6 1.43924e-5 -1.93848e-5 -3.4e-5 1.43924e-5 -1.93848e-5 -5e-6 1.5e-5 -1.51589e-5 -3.4e-5 1.5e-5 -1.51589e-5 -5e-6 1.5e-5 1.34115e-6 -3.4e-5 1.5e-5 4.48412e-5 -5e-6 5e-5 -5.01588e-5 -5e-6 5e-5 -5.01588e-5 0 5e-5 4.98411e-5 -5e-6 5e-5 4.98411e-5 0</float_array>
+          <technique_common>
+            <accessor source="#Solar_pannel_5-mesh-positions-array" count="74" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Solar_pannel_5-mesh-normals">
+          <float_array id="Solar_pannel_5-mesh-normals-array" count="219">-1 0 0 -0.9898214 -0.1423158 0 -0.909632 -0.4154152 0 -0.9096322 -0.4154148 0 -0.7557501 -0.6548603 0 -0.7557497 -0.6548606 0 -0.5406413 -0.8412532 0 -0.5406413 -0.8412533 0 -0.2817321 -0.9594932 0 -0.2817322 -0.9594932 0 0 -1 0 0.2817322 -0.9594932 0 0.281732 -0.9594932 0 0.5406413 -0.8412532 0 0.5406413 -0.8412533 0 0.7557498 -0.6548605 0 0.75575 -0.6548603 0 0.9096322 -0.4154148 0 0.909632 -0.4154152 0 0.9898214 -0.1423158 0 1 0 0 0 0.5547001 -0.8320503 0 0.5547002 -0.8320504 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 5.57735e-7 0 -1 1.11233e-6 0 -1 -8.34248e-7 0 -1 1.07778e-6 0 -1 -1.97812e-6 0 -1 1.97812e-6 0 -1 -1.72445e-6 0 -1 -5.57735e-7 0 -1 0 1 0 -0.8660256 -0.4999998 0 -0.8660256 -0.4999997 0 0.8660256 -0.4999997 0 0.8660256 -0.4999998 0 0.8660255 0.5 0 0.8660256 0.4999998 0 -0.8660256 0.4999998 0 -0.8660255 0.5 0 0 0 1 -1.52597e-6 0 1 1.52596e-6 0 1 -2.75414e-6 0 1 3.05193e-6 0 1 -1.37707e-6 0 1 -0.965926 -0.2588186 0 -0.9659259 -0.2588189 0 -0.7071059 -0.7071077 0 -0.2588203 -0.9659256 0 -0.2588202 -0.9659256 0 0.2588203 -0.9659256 0 0.2588202 -0.9659256 0 0.7071059 -0.7071077 0 0.9659259 -0.2588189 0 0.9659259 -0.2588186 0 0.965926 0.2588188 0 0.9659259 0.2588191 0 0.7071063 0.7071073 0 0.7071061 0.7071075 0 0.2588198 0.9659257 0 -0.2588198 0.9659257 0 -0.7071063 0.7071073 0 -0.7071061 0.7071075 0 -0.9659259 0.258819 0 -0.965926 0.2588188 0 0 0 1</float_array>
+          <technique_common>
+            <accessor source="#Solar_pannel_5-mesh-normals-array" count="73" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Solar_pannel_5-mesh-map-0">
+          <float_array id="Solar_pannel_5-mesh-map-0-array" count="864">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.6520277 0.4385821 0.654422 0.4957463 0.6547054 0.4963027 0.6039989 0.4738361 0.6520277 0.4385821 0.6547054 0.4963027 0.7076417 0.4634953 0.6548718 0.4948583 0.654422 0.4957463 0.6520277 0.4385821 0.7076417 0.4634953 0.654422 0.4957463 0 0 0 0 0 0 0.7076417 0.4634953 0.7077437 0.5297672 0.6548718 0.4948583 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.7077437 0.5297672 0.9931684 9.96433e-5 0.9899856 0.9999004 0.9931684 9.96433e-5 0.7077437 0.5297672 0.7076417 0.4634953 0.6520277 0.4385821 0.9931684 9.96433e-5 0.7076417 0.4634953 9.96687e-5 0.03569132 0.9931684 9.96433e-5 0.6520277 0.4385821 0.6039989 0.4738361 9.96687e-5 0.03569132 0.6520277 0.4385821 0.02284026 0.9999004 9.96687e-5 0.03569132 0.6039989 0.4738361 0.6043543 0.5377624 0.02284026 0.9999004 0.6039989 0.4738361 0.9899856 0.9999004 0.02284026 0.9999004 0.6043543 0.5377624 0.6570609 0.5685414 0.9899856 0.9999004 0.6043543 0.5377624 0.7077437 0.5297672 0.9899856 0.9999004 0.6570609 0.5685414</float_array>
+          <technique_common>
+            <accessor source="#Solar_pannel_5-mesh-map-0-array" count="432" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Solar_pannel_5-mesh-vertices">
+          <input semantic="POSITION" source="#Solar_pannel_5-mesh-positions"/>
+        </vertices>
+        <triangles material="Solar_pannel_5-material" count="144">
+          <input semantic="VERTEX" source="#Solar_pannel_5-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Solar_pannel_5-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#Solar_pannel_5-mesh-map-0" offset="2" set="0"/>
+          <p>6 0 0 4 0 1 5 0 2 7 0 3 6 0 4 5 0 5 8 1 6 5 1 7 4 1 8 9 1 9 5 1 10 8 1 11 10 2 12 9 2 13 8 2 14 11 3 15 9 3 16 10 3 17 12 4 18 11 4 19 10 4 20 13 5 21 11 5 22 12 5 23 16 6 24 13 6 25 12 6 26 17 7 27 13 7 28 16 7 29 28 8 30 17 8 31 16 8 32 29 9 33 17 9 34 28 9 35 44 10 36 29 10 37 28 10 38 45 10 39 29 10 40 44 10 41 56 11 42 45 11 43 44 11 44 57 12 45 45 12 46 56 12 47 60 13 48 57 13 49 56 13 50 61 14 51 57 14 52 60 14 53 62 15 54 61 15 55 60 15 56 63 16 57 61 16 58 62 16 59 64 17 60 63 17 61 62 17 62 65 18 63 63 18 64 64 18 65 66 19 66 65 19 67 64 19 68 67 19 69 65 19 70 66 19 71 69 20 72 67 20 73 66 20 74 68 20 75 69 20 76 66 20 77 69 21 78 68 21 79 6 21 80 7 22 81 69 22 82 6 22 83 0 23 84 9 23 85 11 23 86 13 24 87 0 24 88 11 24 89 61 24 90 63 24 91 70 24 92 57 24 93 61 24 94 70 24 95 70 25 96 63 25 97 65 25 98 67 24 99 70 24 100 65 24 101 72 26 102 70 26 103 67 26 104 69 24 105 72 24 106 67 24 107 2 24 108 72 24 109 69 24 110 7 24 111 2 24 112 69 24 113 0 27 114 2 27 115 7 27 116 5 24 117 0 24 118 7 24 119 9 24 120 0 24 121 5 24 122 0 28 123 13 28 124 17 28 125 29 24 126 0 24 127 17 24 128 70 24 129 0 24 130 29 24 131 45 24 132 70 24 133 29 24 134 57 24 135 70 24 136 45 24 137 54 24 138 64 24 139 46 24 140 54 24 141 48 24 142 68 24 143 66 24 144 54 24 145 68 24 146 64 24 147 54 24 148 66 24 149 37 24 150 40 24 151 44 24 152 28 24 153 37 24 154 44 24 155 30 24 156 37 24 157 28 24 158 46 24 159 64 24 160 62 24 161 60 29 162 46 29 163 62 29 164 40 24 165 46 24 166 60 24 167 56 24 168 40 24 169 60 24 170 44 30 171 40 30 172 56 30 173 30 31 174 28 31 175 16 31 176 12 24 177 30 24 178 16 24 179 24 24 180 30 24 181 12 24 182 68 32 183 48 32 184 42 32 185 38 33 186 68 33 187 42 33 188 6 24 189 68 24 190 38 24 191 6 34 192 38 34 193 32 34 194 26 35 195 6 35 196 32 35 197 4 24 198 6 24 199 26 24 200 18 24 201 4 24 202 26 24 203 8 24 204 4 24 205 18 24 206 24 24 207 8 24 208 18 24 209 10 24 210 8 24 211 24 24 212 12 36 213 10 36 214 24 36 215 70 10 216 71 10 217 1 10 218 0 10 219 70 10 220 1 10 221 0 0 222 1 0 223 3 0 224 2 0 225 0 0 226 3 0 227 2 37 228 3 37 229 73 37 230 72 37 231 2 37 232 73 37 233 72 20 234 73 20 235 71 20 236 70 20 237 72 20 238 71 20 239 53 38 240 52 38 241 58 38 242 59 39 243 53 39 244 58 39 245 23 10 246 22 10 247 52 10 248 53 10 249 23 10 250 52 10 251 15 40 252 14 40 253 22 40 254 23 41 255 15 41 256 22 41 257 21 42 258 20 42 259 14 42 260 15 43 261 21 43 262 14 43 263 51 37 264 50 37 265 20 37 266 21 37 267 51 37 268 20 37 269 59 44 270 58 44 271 50 44 272 51 45 273 59 45 274 50 45 275 19 46 276 22 46 277 14 46 278 41 46 279 20 46 280 50 46 281 20 46 282 41 46 283 34 46 284 31 46 285 20 46 286 34 46 287 14 46 288 20 46 289 31 46 290 25 46 291 14 46 292 31 46 293 19 46 294 14 46 295 25 46 296 43 46 297 58 46 298 52 46 299 58 47 300 43 47 301 49 47 302 55 46 303 58 46 304 49 46 305 50 46 306 58 46 307 55 46 308 47 46 309 50 46 310 55 46 311 41 46 312 50 46 313 47 46 314 22 48 315 19 48 316 27 48 317 33 49 318 22 49 319 27 49 320 52 46 321 22 46 322 33 46 323 39 50 324 52 50 325 33 50 326 43 51 327 52 51 328 39 51 329 48 52 330 54 52 331 55 52 332 49 53 333 48 53 334 55 53 335 42 54 336 48 54 337 49 54 338 43 54 339 42 54 340 49 54 341 38 55 342 42 55 343 43 55 344 39 56 345 38 56 346 43 56 347 32 57 348 38 57 349 39 57 350 33 58 351 32 58 352 39 58 353 26 59 354 32 59 355 33 59 356 27 59 357 26 59 358 33 59 359 18 60 360 26 60 361 27 60 362 19 61 363 18 61 364 27 61 365 24 62 366 18 62 367 19 62 368 25 63 369 24 63 370 19 63 371 30 64 372 24 64 373 25 64 374 31 65 375 30 65 376 25 65 377 35 66 378 30 66 379 31 66 380 36 66 381 35 66 382 31 66 383 40 67 384 35 67 385 36 67 386 41 67 387 40 67 388 36 67 389 46 68 390 40 68 391 41 68 392 47 69 393 46 69 394 41 69 395 54 70 396 46 70 397 47 70 398 55 71 399 54 71 400 47 71 401 51 46 402 1 46 403 71 46 404 1 46 405 51 46 406 21 46 407 15 46 408 1 46 409 21 46 410 3 72 411 1 72 412 15 72 413 23 46 414 3 46 415 15 46 416 73 46 417 3 46 418 23 46 419 53 46 420 73 46 421 23 46 422 71 46 423 73 46 424 53 46 425 59 46 426 71 46 427 53 46 428 51 46 429 71 46 430 59 46 431</p>
+        </triangles>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="Scene" name="Scene">
+      <node id="node0" name="node0" type="NODE">
+        <matrix sid="transform">1000 0 0 0 0 1000 0 0 0 0 1000 0 0 0 0 1</matrix>
+        <instance_geometry url="#Solar_pannel_5-mesh" name="node0">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="Solar_pannel_5-material" target="#Solar_pannel_5-material">
+                <bind_vertex_input semantic="UVКарта" input_semantic="TEXCOORD" input_set="0"/>
+              </instance_material>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="Camera" name="Camera" type="NODE">
+        <matrix sid="transform">0.6859207 -0.3240135 0.6515582 7.358891 0.7276763 0.3054208 -0.6141704 -6.925791 0 0.8953956 0.4452714 4.958309 0 0 0 1</matrix>
+        <instance_camera url="#Camera-camera"/>
+      </node>
+      <node id="Light" name="Light" type="NODE">
+        <matrix sid="transform">-0.2908646 -0.7711008 0.5663932 4.076245 0.9551712 -0.1998834 0.2183912 1.005454 -0.05518906 0.6045247 0.7946723 5.903862 0 0 0 1</matrix>
+        <instance_light url="#Light-light"/>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene"/>
+  </scene>
+</COLLADA>
