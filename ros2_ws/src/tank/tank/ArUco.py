@@ -32,16 +32,16 @@ class ArUcoDetection(Node):
 
         self.cap = cv2.VideoCapture(0)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1280)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 108)
 
-        self.create_timer(0.1, self.image_callback)
+        self.create_timer(0.01, self.image_callback)
 
     def image_callback(self):
         ret, img = self.cap.read()
-        h, w, _ = img.shape
-        width = 1000
-        height = int(width * (h / w))
-        img = cv2.resize(img, (width, height), interpolation=cv2.INTER_CUBIC)
+        #h, w, _ = img.shape
+        #width = 960
+        #height = 540
+        #img = cv2.resize(img, (width, height), interpolation=cv2.INTER_CUBIC)
 
         corners, ids, rejected = cv2.aruco.detectMarkers(img, self.arucoDict, parameters=self.arucoParams)
         detected_markers = self.aruco_display(corners, ids, rejected, img)
