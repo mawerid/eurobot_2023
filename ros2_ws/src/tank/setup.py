@@ -17,6 +17,8 @@ setup(
         (os.path.join('share', package_name, 'rviz/'), glob('rviz/*.rviz')),
         (os.path.join('share', package_name, 'meshes/'), glob('meshes/*.STL')),
         (os.path.join('share', package_name, 'config/'), glob('config/*.yaml')),
+        (os.path.join('share', package_name, 'msg/'), glob('msg/*.msg')),
+
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -31,6 +33,7 @@ setup(
             'minimal_publisher = tank.minimal_publisher:main',
             'ArUco = tank.ArUco:main',
             'reboot = tank.reboot:main',
+            #'stepper_publisher = tank.stepper_publisher:main',
             ],
 
     },
