@@ -29,11 +29,12 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'QR_detector = tank.QR_detector:main',
             'minimal_publisher = tank.minimal_publisher:main',
             'ArUco = tank.ArUco:main',
             'reboot = tank.reboot:main',
-            #'stepper_publisher = tank.stepper_publisher:main',
+            'move_base = tank.move_base:main',
+            'angle_radius = tank.angle_radius:main',
+            'screen = tank.screen:main',
             ],
 
     },
