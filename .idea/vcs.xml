@@ -2,10 +2,6 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/scipts/Hierarchical-Localization" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/scipts/Hierarchical-Localization/third_party/SuperGluePretrainedNetwork" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/scipts/Hierarchical-Localization/third_party/d2net" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/scipts/Hierarchical-Localization/third_party/deep-image-retrieval" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/scipts/Hierarchical-Localization/third_party/r2d2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ros2_ws/src/build/micro_ros_agent/agent/src/xrceagent" vcs="Git" />
   </component>
 </project>

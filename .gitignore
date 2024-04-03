@@ -1,4 +1,6 @@
 #default micro_ros packages
+.idea
+.vscode
 ros2_ws/build*
 ros2_ws/firmware*
 ros2_ws/install*
