@@ -1,0 +1,8 @@
+[Unit]
+Description=autocomposer
+
+[Service]
+ExecStart=/home/pi/eurobot_2024/start.sh
+
+[Install]
+WantedBy=multi-user.target
