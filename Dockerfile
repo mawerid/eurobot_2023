@@ -1,23 +1,17 @@
 # Use ROS2 humble from osrf/ros image
-FROM osrf/ros:humble-desktop-full
+FROM ros:humble-ros-base
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install necessary packages for building OpenCV
 RUN apt-get update && apt-get install -y \
-    build-essential cmake \
+    git build-essential cmake \
     libcanberra-gtk-module libcanberra-gtk3-module fuse3 libfuse2 libqt5svg5-dev \
     python3-pip python3-opencv python3-tk python3-pyqt5.qtwebengine python3-rosdep
 
-# Clone OpenCV repository
-RUN git clone --branch 4.9.0 https://github.com/opencv/opencv.git /opencv
-
-# Build and install OpenCV
-RUN mkdir /opencv/build && cd /opencv/build && \
-    cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local .. && \
-    make -j$(nproc) && \
-    make install
+# Install OpenCV
+RUN pip3 install opencv-contrib-python
 
 # Source ROS2 setup.bash
 RUN /bin/bash -c "source /opt/ros/humble/setup.bash"
