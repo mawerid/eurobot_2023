@@ -25,5 +25,11 @@ Delete container: `sudo docker rm eurobot_2024-base-1`
 
 Delete image: `sudo docker rmi eurobot_2024-base`
 
+Check status of autostart service: `sudo systemctl status autocomposer`
+
+Stop autostart service: `sudo systemctl stop autocomposer`
+
+Disable autostart service: `sudo systemctl disable autocomposer`
+
 ## Troubleshooting:
 If there is no container `eurobot_2024-base-1` check out all containers with `sudo docker ps`
