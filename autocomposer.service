@@ -1,0 +1,8 @@
+[Unit]
+Description=Start on boot for docker compose
+
+[Service]
+ExecStart=~/eurobot_2024/start.sh
+
+[Install]
+WantedBy=multi-user.target
