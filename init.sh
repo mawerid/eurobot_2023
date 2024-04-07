@@ -28,3 +28,7 @@ sudo systemctl enable containerd.service
 
 # Clone repo
 git clone https://github.com/NTDV/eurobot_2024.git
+sudo chmod +x ~/eurobot_2024/start.sh
+sudo scp ~/eurobot_2024/autocomposer.service /etc/systemd/system/
+sudo systemctl enable autocomposer
+sudo systemctl start autocomposer
