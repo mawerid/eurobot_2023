@@ -27,7 +27,7 @@ RUN /bin/bash -c "git clone -b humble https://github.com/micro-ROS/micro_ros_set
 RUN /bin/bash -c "rosdep install --from-paths src --ignore-src --rosdistro humble -y"
 RUN /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build"
 
-RUN sudo apt-get install -y ros-humble-image-common
+RUN sudo apt-get install -y ros-humble-image-common ros-humble-vision-opencv
 
 
 RUN echo "source /workspace/install/setup.sh" >> ~/.bashrc
