@@ -1,6 +1,7 @@
 #!/bin/bash
 cd /home/pi/eurobot_2024
-git pull origin master
+git reset --hard HEAD
+git pull
 sudo chmod +x start.sh
 xauth list
 sudo docker compose up
