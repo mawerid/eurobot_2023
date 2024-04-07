@@ -22,6 +22,8 @@ services:
       # Mount the source code
       - ./ros2_ws/src:/workspace/src
       - /dev/bus/usb:/dev/bus/usb
+      - /dev/video0:/dev/video0
+      - /dev/video0:/dev/video1
     command: bash -c "
       source /workspace/install/setup.sh &&
       sleep infinity"
