@@ -1,5 +1,5 @@
 #!/bin/bash
-cd eurobot_2024
+cd /home/pi/eurobot_2024
 git pull origin master
 sudo chmod +x start.sh
 xauth list
