@@ -26,6 +26,9 @@ sudo docker run hello-world
 sudo systemctl enable docker.service
 sudo systemctl enable containerd.service
 
+# Install x11
+sudo apt-get install -y xauth
+
 # Clone repo
 git clone https://github.com/NTDV/eurobot_2024.git
 cd /home/pi/eurobot_2024
