@@ -2,7 +2,7 @@
 Files for EuroBot 2024 competition.
 By MEPhI students
 
-# ONLY FOR ARM64
+# Only for ARM64
 ## Installation:
 `git clone https://github.com/mawerid/eurobot_2024.git`
 
