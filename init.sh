@@ -4,8 +4,8 @@ for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do
 
 # Add Docker's official GPG key:
 sudo apt-get update
-sudo apt-get install ca-certificates curl
-sudo install -m 0755 -d /etc/apt/keyrings
+sudo apt-get install -y ca-certificates curl
+sudo install -y -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 
@@ -17,7 +17,7 @@ echo \
 sudo apt-get update
 
 # Install latest docker with dependencies
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # Test installation
 sudo docker run hello-world
