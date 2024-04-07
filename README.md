@@ -1,17 +1,29 @@
 # Eurobot 2024
-Files for EuroBot 2023 competition.
+Files for EuroBot 2024 competition.
 By MEPhI students
 
-## Usage:
+## Installation:
+`git clone https://github.com/mawerid/eurobot_2024.git`
 
-### Build
+`cd eurobot_2024`
 
-    docker compose build
+`sudo bash init.sh`
 
-### Run
+## Open X11:
+On local machine copy the output of `xauth list`.
 
-To run this project just do this:
+Open container's terminal: `sudo docker exec -it eurobot_2024-base-1 bash`
 
-    docker compose up
+Inside the container: `sudo xauth add <TOKEN LINE>`
 
-And after that you can connect to the image and run bash (or attach vscode) 
+Then you can start GUI apps inside the container, for example `rviz2`
+
+## Optional:
+Stop container: `sudo docker stop eurobot_2024-base-1`
+
+Delete container: `sudo docker rm eurobot_2024-base-1`
+
+Delete image: `sudo docker rmi eurobot_2024-base`
+
+## Troubleshooting:
+If there is no container `eurobot_2024-base-1` check out all containers with `sudo docker ps`
