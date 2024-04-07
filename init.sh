@@ -30,7 +30,7 @@ sudo systemctl enable containerd.service
 sudo apt-get install -y xauth
 
 # Clone repo
-git clone https://github.com/NTDV/eurobot_2024.git
+#git clone https://github.com/NTDV/eurobot_2024.git
 cd /home/pi/eurobot_2024
 sudo chmod +x start.sh
 sudo mv -f autocomposer.service /etc/systemd/system/
