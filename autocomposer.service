@@ -1,5 +1,5 @@
 [Unit]
-Description=Start on boot for docker compose
+Description=autocomposer
 
 [Service]
 ExecStart=home/pi/eurobot_2024/start.sh
