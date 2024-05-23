@@ -8,56 +8,41 @@ from launch.conditions import IfCondition, UnlessCondition
 
 
 def generate_launch_description():
-    ekf_config_path = PathJoinSubstitution(
-        [FindPackageShare("tank"), "config", "ekf.yaml"]
-    )
-
+    
     default_robot_launch_path = PathJoinSubstitution(
         [FindPackageShare('tank'), 'launch', 'default_tank.launch.py']
     )
-
-    #custom_robot_launch_path = PathJoinSubstitution(
-     #   [FindPackageShare('linorobot2_bringup'), 'launch', 'custom_robot.launch.py']
-    #)
-
     return LaunchDescription([
 
         DeclareLaunchArgument(
-            name='tank_custom', 
-            default_value='false',
-            description='tank_base'
-        ),
-
-        DeclareLaunchArgument(
-            name='base_serial_port', 
+            name='Pico 1', 
             default_value='/dev/ttyACM0',
-            #default_value='/dev/ttyS0',
-            description='Tank Base Serial Port'
+            description='Tank Pico 1'
         ),
 
         DeclareLaunchArgument(
-            name='odom_topic', 
-            default_value='/odom',
-            description='EKF out odometry topic'
-        ),
-        
-        Node(
-            package='robot_localization',
-            executable='ekf_node',
-            name='ekf_filter_node',
-            output='screen',
-            parameters=[
-                ekf_config_path
-            ],
-            remappings=[("odometry/filtered", LaunchConfiguration("odom_topic"))]
+            name='Pico 2', 
+            default_value='/dev/ttyACM1',
+            description='Tank Pico 2'
         ),
 
-        IncludeLaunchDescription(
+        Node(
+            package='tank',
+            executable='reboot',
+            name='reboot',
+        ),
+
+        Node(
+            package='tank',
+            executable='tank_camera',
+            name='tank_camera',
+        ),
+
+       IncludeLaunchDescription(
             PythonLaunchDescriptionSource(default_robot_launch_path),
-            condition=UnlessCondition(LaunchConfiguration("tank_custom")),
             launch_arguments={
-                'base_serial_port': LaunchConfiguration("base_serial_port")
+                'Pico 1': LaunchConfiguration("Pico 1"),
+                'Pico 2': LaunchConfiguration("Pico 2")
             }.items()
         ),
-
     ])

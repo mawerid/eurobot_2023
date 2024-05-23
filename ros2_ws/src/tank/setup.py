@@ -33,8 +33,12 @@ setup(
             'ArUco = tank.ArUco:main',
             'reboot = tank.reboot:main',
             'move_base = tank.move_base:main',
-            'angle_radius = tank.angle_radius:main',
+            'static_radius = tank.static_radius:main',
             'screen = tank.screen:main',
+            'systest_script = tank.systest_script:main',
+            'move_planning = tank.move_planning:main',
+            'robot_place = tank.robot_place:main',
+            'tank_camera = tank.tank_camera:main'
             ],
 
     },

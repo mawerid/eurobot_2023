@@ -7,7 +7,7 @@ class Screen(Node):
 
     def __init__(self):
         super().__init__('screen')
-        self.screen_publisher = self.create_publisher(Char, 'screen_topic', 10)
+        self.screen_publisher = self.create_publisher(Char, 'display_topic', 10)
         timer_period = 1  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0        
@@ -17,7 +17,10 @@ class Screen(Node):
         msg.data = self.i
         self.get_logger().info('Points "%s"' % self.i)
         self.screen_publisher.publish(msg)
-        self.i += 1
+        if self.i == 10:
+            self.i = 0
+        else:
+            self.i += 1
 
 def main(args=None):
     rclpy.init(args=args)
