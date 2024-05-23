@@ -12,29 +12,23 @@ class Drum(Node):
     def __init__(self):
         super().__init__('move_base')
         self.drum_publisher = self.create_publisher(Vector3, 'stepper_topic', 10)
-        self.drum_response = self.create_publisher(Bool, 'response_drum', 10)
-        '''
-        self.imu_subscriber = self.create_subscription(Imu, 'imu_topic', self.listener_imu, 10)
-        self.imu_subscriber
-        self.aim_subscriber = self.create_subscription(Vector3, 'aim_topic', self.action, 10)
-        self.aim_subscriber 
-        self.vel = Vector3()
+        #self.drum_response = self.create_publisher(Bool, 'response_drum', 10)
+        self.drum_listener = self.create_subscription(Bool, 'drum_command', self.listener_drum, 10)
+        self.drum_listener
+        self.drum_response = False
+        self.drum = Vector3()
 
-    def listener_imu(self, msg):
-        self.imu_info = msg.angular_velocity
-        self.get_logger().info('Imu_information: "%s"' % msg.angular_velocity)
+    def listener_drum(self, msg):
+        self.drum_response = msg
 
     def rotate(self, dim):
-        if dim == 'clockwise':
-            self.vel.linear.x = 0.0
-            self.vel.linear.y = 0.0
-            self.vel.angular.z = 2.15
-            self.wheel_publisher.publish(self.vel)
-        else:
-            self.vel.linear.x = 0.0
-            self.vel.linear.y = 0.0
-            self.vel.angular.z = -2.15
-            self.wheel_publisher.publish(self.vel)
+        if self.drum_response is True:
+            self.drum.x = 1.0
+            self.drum.y = 1.0
+            self.drum.z = 60.0
+            self.drum_publisher.publish(self.drum)
+            self.drum_response = False
+
 
 def main(args=None):
     rclpy.init(args=args)
@@ -49,4 +43,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-'''

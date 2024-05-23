@@ -71,75 +71,78 @@ class ArucoDetection(Node):
                 self.get_logger().info("[Inference] ArUco marker ID: %d" % markerID)
         return image
 
-    def pose_estimation(self, frame, aruco_dict_type, matrix_coefficients, distortion_coefficients):
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        cv2.aruco_dict = cv2.aruco.getPredefinedDictionary(aruco_dict_type)
-        parameters = cv2.aruco.DetectorParameters()
+    def pose_estimation(frame, aruco_dict_type, matrix_coefficients, distortion_coefficients):
+	    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        corners, ids, _ = cv2.aruco.detectMarkers(gray, aruco_dict)
+	    aruco_dict = cv2.aruco.getPredefinedDictionary(aruco_dict_type)
+	    parameters = cv2.aruco.DetectorParameters()
 
-        if len(corners) > 0:
-            rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, 0.02, matrix_coefficients, distortion_coefficients)
+	    corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, aruco_dict)
 
-            index_marker_2 = None
-            index_marker_21 = None
+	    if len(corners) > 0:
+		rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, 0.02, matrix_coefficients,
+		                                                      distortion_coefficients)
 
-            for i in range(len(ids)):
-                cv2.aruco.drawDetectedMarkers(frame, corners)
+		index_marker_5 = None
+		index_marker_18 = None
+		index_marker_12 = None
+		index_marker_42 = None
 
-                if rvecs[i] is not None and tvecs[i] is not None:
-                    rvec = rvecs[i]
-                    tvec = tvecs[i]
-                    cv2.drawFrameAxes(frame, matrix_coefficients, distortion_coefficients, rvec, tvec, 0.50)
+		for i in range(len(ids)):
+		    cv2.aruco.drawDetectedMarkers(frame, corners)
 
-                    center_marker = np.mean(corners[i][0], axis=0)
+		    if rvecs[i] is not None and tvecs[i] is not None:
+		        rvec = rvecs[i]
+		        tvec = tvecs[i]
+		        cv2.drawFrameAxes(frame, matrix_coefficients, distortion_coefficients, rvec, tvec, 0.03)
 
-                    cv2.circle(frame, tuple(center_marker.astype(int)), 5, (0, 0, 255), -1)
+		        center_marker = np.mean(corners[i][0], axis=0)
 
-                    if ids[i] == 2:
-                        rotation_matrix, _ = cv2.Rodrigues(rvec)
-                        x_axis_vector = rotation_matrix[:, 0]
+		        cv2.circle(frame, tuple(center_marker[:2].astype(int)), 5, (0, 0, 255),
+		                   -1)
 
-                        index_marker_2 = i
+		        if ids[i] == 5:
+		            index_marker_5 = i
 
-                    if ids[i] == 21:
-                        center_marker_21 = np.mean(corners[i][0], axis=0)
-                        index_marker_21 = i
+		        elif ids[i] == 18:
+		            index_marker_18 = i
 
+		        elif ids[i] == 12:
+		            index_marker_12 = i
 
-            if index_marker_2 is not None and index_marker_21 is not None:
+		        elif ids[i] == 42:
+		            index_marker_42 = i
 
-                center_marker_2 = tvecs[index_marker_2][0]
+		if index_marker_5 is not None and index_marker_18 is not None and index_marker_12 is not None and index_marker_42 is not None:
+		    center_marker_5 = tvecs[index_marker_5][0]
+		    center_marker_18 = tvecs[index_marker_18][0]
+		    center_marker_12 = tvecs[index_marker_12][0]
+		    center_marker_42 = tvecs[index_marker_42][0]
 
-                center_marker_21 = tvecs[index_marker_21][0]
-
-                vector_2_to_21 = center_marker_21 - center_marker_2
-
-
-                x_axis_vector_normalized = x_axis_vector / np.linalg.norm(x_axis_vector)
-                vector_2_to_21_normalized = vector_2_to_21 / np.linalg.norm(vector_2_to_21)
-
-
-                angle_rad = np.arctan2(np.linalg.norm(np.cross(x_axis_vector_normalized, vector_2_to_21_normalized)),
-                                       np.dot(x_axis_vector_normalized, vector_2_to_21_normalized))
-
-
-                angle_deg = np.degrees(angle_rad)
-
-                print("Угол :", angle_deg)
+		    vector_12_to_18 = center_marker_18 - center_marker_12
+		    vector_2_to_42 = center_marker_42 - center_marker_5
 
 
-                distance = np.linalg.norm(center_marker_21 - center_marker_2)
-                print("Расстояние:", distance)
+		    cv2.arrowedLine(frame, tuple(center_marker_12[:2].astype(int)), tuple(center_marker_18[:2].astype(int)),
+		                    (255, 0, 0), 2)
 
-                msg = Vector3()
-                msg.x = distance
-                msg.y = angle_deg
-                self.publisher_aim.publish(msg)
+		    cv2.arrowedLine(frame, tuple(center_marker_5[:2].astype(int)), tuple(center_marker_42[:2].astype(int)),
+		                    (0, 255, 0), 2)
 
 
+		    angle_rad = np.arccos(np.dot(vector_12_to_18, vector_2_to_42) / (
+		                np.linalg.norm(vector_12_to_18) * np.linalg.norm(vector_2_to_42)))
+		    angle_deg = np.degrees(angle_rad)
 
-        return frame
+
+		    print("Угол между векторами 12-18 5-42:", angle_deg)
+
+
+		    distance_2_to_42 = np.linalg.norm(center_marker_42 - center_marker_5)
+
+		    print("Расстояние между маркерами 5 и 42:", distance_2_to_42)
+
+	    return frame
 
 def main(args=None):
     rclpy.init(args=args)
