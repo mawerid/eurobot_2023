@@ -5,7 +5,6 @@ from std_msgs.msg import String
 from time import sleep
 
 
-
 class PlantGrabbing(Node):
 
     def __init__(self):
@@ -18,24 +17,22 @@ class PlantGrabbing(Node):
         self.subscriptions
         self.count = 0.0
 
-
     def act_decision(self, msg):
         if msg.data == "grab_the_plant":
-
             down = Vector3()
             down.x = 2.0
             down.y = 1.0
             down.z = 700.
             self.publisher_stepper.publish(down)
             sleep(4)
-            
+
             grab = Vector3()
             grab.x = self.count + 1
             self.count += 1
             grab.y = 120.
             self.publisher_servo.publish(grab)
             screen = Vector3()
-            screen.x = self.count 
+            screen.x = self.count
             self.screen_publisher.publish(screen)
             sleep(4)
 
@@ -53,7 +50,7 @@ class PlantGrabbing(Node):
             resp = String()
             resp.data = "grab_done"
             self.publisher_response.publish(resp)
-            
+
 
 def main(args=None):
     rclpy.init(args=args)

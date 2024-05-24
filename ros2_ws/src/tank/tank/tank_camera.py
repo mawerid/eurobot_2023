@@ -12,7 +12,7 @@ class TankCamera(Node):
         self.publisher_plant = self.create_publisher(Vector3, 'plant_id', 10)
 
         self.aruco_dict = {
-             "DICT_4X4_50": cv2.aruco.DICT_4X4_50,
+            "DICT_4X4_50": cv2.aruco.DICT_4X4_50,
             "DICT_4X4_100": cv2.aruco.DICT_4X4_100,
             "DICT_4X4_250": cv2.aruco.DICT_4X4_250,
             "DICT_4X4_1000": cv2.aruco.DICT_4X4_1000
@@ -22,28 +22,28 @@ class TankCamera(Node):
         self.arucoDict = cv2.aruco.getPredefinedDictionary(self.aruco_dict[self.aruco_type])
         self.arucoParams = cv2.aruco.DetectorParameters()
 
-        self.cameraMatrix = np.array([[ 1479.056415,  0.000000,  978.753591],
-                                    [ 0.000000,  1509.366213,  566.296338],
-                                    [ 0.000000,  0.000000,  1.000000]])
+        self.cameraMatrix = np.array([[1479.056415, 0.000000, 978.753591],
+                                      [0.000000, 1509.366213, 566.296338],
+                                      [0.000000, 0.000000, 1.000000]])
 
-        self.distCoeffs = np.array([[ 9.479044],
-                                    [ 114.252232],
+        self.distCoeffs = np.array([[9.479044],
+                                    [114.252232],
                                     [-0.000444],
                                     [-0.000154],
-                                    [ 111.778905],
-                                    [ 9.622339],
-                                    [ 110.937167],
-                                    [ 116.349463],
-                                    [ 0.000000],
-                                    [ 0.000000],
-                                    [ 0.000000],
-                                    [ 0.000000],
-                                    [ 0.000000],
-                                    [ 0.000000]])
+                                    [111.778905],
+                                    [9.622339],
+                                    [110.937167],
+                                    [116.349463],
+                                    [0.000000],
+                                    [0.000000],
+                                    [0.000000],
+                                    [0.000000],
+                                    [0.000000],
+                                    [0.000000]])
 
         self.intrinsic_camera = np.array([[self.cameraMatrix[0, 0], 0, self.cameraMatrix[0, 2]],
-                              [0, self.cameraMatrix[1, 1], self.cameraMatrix[1, 2]],
-                              [0, 0, 1]])
+                                          [0, self.cameraMatrix[1, 1], self.cameraMatrix[1, 2]],
+                                          [0, 0, 1]])
 
         self.distortion = self.distCoeffs
 
@@ -53,10 +53,9 @@ class TankCamera(Node):
 
         self.create_timer(0.01, self.image_callback)
 
-
     def image_callback(self):
         ret, img = self.cap.read()
-        
+
         self.pose_estimation(img, self.aruco_dict[self.aruco_type], self.intrinsic_camera, self.distortion)
 
     def pose_estimation(self, frame, aruco_dict_type, matrix_coefficients, distortion_coefficients):
@@ -65,10 +64,10 @@ class TankCamera(Node):
 
         corners, ids, _ = cv2.aruco.detectMarkers(gray, cv2.aruco_dict)
 
-
         if len(corners) > 0:
-            rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, 0.02, matrix_coefficients, distortion_coefficients)
-   
+            rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, 0.02, matrix_coefficients,
+                                                                  distortion_coefficients)
+
             for i in range(len(ids)):
                 if rvecs[i] is not None and tvecs[i] is not None:
                     rvec = rvecs[i]
@@ -78,6 +77,7 @@ class TankCamera(Node):
                     msg.y = tvec[i][2]
                     self.publisher_plant.publish(msg)
                     print(corners[i])
+
 
 def main(args=None):
     rclpy.init(args=args)
