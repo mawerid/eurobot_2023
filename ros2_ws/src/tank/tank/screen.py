@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-
+from geometry_msgs.msg import Vector3
 from std_msgs.msg import Char
 
 class Screen(Node):
@@ -8,19 +8,13 @@ class Screen(Node):
     def __init__(self):
         super().__init__('screen')
         self.screen_publisher = self.create_publisher(Char, 'display_topic', 10)
-        timer_period = 1  # seconds
-        self.timer = self.create_timer(timer_period, self.timer_callback)
-        self.i = 0        
+        self.screen_listener = self.create_subscription(Vector3, 'screen_info', self.display_pub, 10)
+        self.subscriptions     
     
-    def timer_callback(self):
-        msg = Char()
-        msg.data = self.i
-        self.get_logger().info('Points "%s"' % self.i)
-        self.screen_publisher.publish(msg)
-        if self.i == 10:
-            self.i = 0
-        else:
-            self.i += 1
+    def display_pub(self, msg):
+        disp = Char() 
+        disp.data = int(msg.x)
+        self.screen_publisher.publish(disp)
 
 def main(args=None):
     rclpy.init(args=args)

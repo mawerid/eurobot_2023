@@ -37,6 +37,12 @@ def generate_launch_description():
             executable='tank_camera',
             name='tank_camera',
         ),
+        
+        Node(
+            package='tank',
+            executable='screen',
+            name='screen',
+        ),
 
        IncludeLaunchDescription(
             PythonLaunchDescriptionSource(default_robot_launch_path),
