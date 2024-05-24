@@ -30,7 +30,6 @@ setup(
     entry_points={
         'console_scripts': [
             'minimal_publisher = tank.minimal_publisher:main',
-            'ArUco = tank.ArUco:main',
             'reboot = tank.reboot:main',
             'move_base = tank.move_base:main',
             'static_radius = tank.static_radius:main',
@@ -38,7 +37,10 @@ setup(
             'systest_script = tank.systest_script:main',
             'move_planning = tank.move_planning:main',
             'robot_place = tank.robot_place:main',
-            'tank_camera = tank.tank_camera:main'
+            'tank_camera = tank.tank_camera:main',
+            'scanner = tank.scanner:main',
+            'plant_grabbing = tank.plant_grabbing:main',
+            'after_the_stop = tank.after_the_stop:main'
             ],
 
     },

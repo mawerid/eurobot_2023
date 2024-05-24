@@ -22,6 +22,7 @@ class MoveBase(Node):
         self.imu_correction = self.create_subscription(Float64, 'imu_correct', self.correction, 10)
         self.planner_talk = self.create_publisher(String, 'mv_base_resp', 10)
         self.robot_place = self.create_subscription(Vector3, 'robot_place', self.pose_callback, 10)
+        self.scanning = self.create_subscription(String, 'scan_topic', self.scan_callback, 10)
         self.permit = 'move'
         self.imu_correct = 0
         self.vel = Twist()
@@ -46,16 +47,25 @@ class MoveBase(Node):
         self.pose_x = msg.x
         self.pose_y = msg.y
 
+    def scan_callback(self, msg):
+        if msg.data == 'rotate':
+            if self.pose_x > width/2:
+                self.rotate(dim='overwise')
+            else:
+                self.rotate(dim='clockwise')
+        else:
+            self.stop_wheel()
+
     def rotate(self, dim):
         if dim == 'clockwise':
             self.vel.linear.x = 0.0
             self.vel.linear.y = 0.0
-            self.vel.angular.z = 1.8
+            self.vel.angular.z = 1.9
             self.wheel_publisher.publish(self.vel)
         else:
             self.vel.linear.x = 0.0
             self.vel.linear.y = 0.0
-            self.vel.angular.z = -1.8
+            self.vel.angular.z = -1.9
             self.wheel_publisher.publish(self.vel)
     
     def go_straight(self, dim, axe):
@@ -82,10 +92,13 @@ class MoveBase(Node):
                 self.vel.angular.z = 0.0
                 self.wheel_publisher.publish(self.vel)
 
-    def stop(self):
+    def stop_wheel(self):
         self.vel.linear.x = 0.0
         self.vel.linear.y = 0.0
         self.vel.linear.z = 0.0
+        self.vel.angular.x = 0.0
+        self.vel.angular.y = 0.0
+        self.vel.angular.z = 0.0
         self.wheel_publisher.publish(self.vel)
     
     def make_command(self, dif_angle):
@@ -135,12 +148,12 @@ class MoveBase(Node):
                 else:
                     self.make_command(dif_angle = dif_angle)
             else: 
-                self.stop()
+                self.stop_wheel()
                 resp = String()
                 resp.data = "done"
                 self.planner_talk.publish(resp)
         else:
-            self.stop()
+            self.stop_wheel()
             resp = String()
             resp.data = "stop_obstacle"
             self.planner_talk.publish(resp)

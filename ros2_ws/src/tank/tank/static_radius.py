@@ -19,18 +19,18 @@ class StaticRadius(Node):
         self.arucoDict = cv2.aruco.getPredefinedDictionary(self.aruco_dict[self.aruco_type])
         self.arucoParams = cv2.aruco.DetectorParameters()
 
-        self.cameraMatrix = np.array([[ 1316.741948,  0.000000,  928.288568],
-                                        [ 0.000000,  1344.516871,  544.438518],
-                                            [ 0.000000,  0.000000,  1.000000]])
+        self.cameraMatrix = np.array([[ 1558.756635,  0.000000,  1981.595037],
+                                        [ 0.000000,  1594.619169,  1163.131045],
+                                         [ 0.000000,  0.000000,  1.000000]])
 
-        self.distCoeffs = np.array([[-0.162078],
-                                    [ 7.725812],
-                                    [ 0.000708],
-                                    [-0.002309],
-                                    [-0.192252],
-                                    [ 0.096461],
-                                    [ 7.558903],
-                                    [ 2.387815],
+        self.distCoeffs = np.array([[ 46.444281],
+                                    [-101.568717],
+                                    [ 0.001139],
+                                    [ 0.000560],
+                                    [ 84.387716],
+                                    [ 46.815570],
+                                    [-102.549148],
+                                    [ 85.284062],
                                     [ 0.000000],
                                     [ 0.000000],
                                     [ 0.000000],
@@ -51,6 +51,7 @@ class StaticRadius(Node):
         self.static_aruco = self.create_publisher(Vector3, 'static_aruco', 10)
         self.place = self.create_publisher(Vector3, 'robot_place', 10)
         self.obstacle = self.create_publisher(String, 'obstacle_info',10)
+        self.enemy = self.create_publisher(Vector3, 'enemy_place',10)
 
         self.create_timer(0.01, self.image_callback)
 
@@ -63,9 +64,6 @@ class StaticRadius(Node):
 
     def image_callback(self):
         ret, img = self.cap.read()
-
-        # annotated_frame = pose_estimation(frame, ARUCO_DICT[aruco_type], cameraMatrix, distCoeffs)
-        # cv2.imshow('Annotated Frame', annotated_frame)
         self.pose_estimation(img, self.aruco_dict[self.aruco_type], self.intrinsic_camera, self.distortion)
 
     def pose_estimation(self, frame, aruco_dict_type, matrix_coefficients, distortion_coefficients):
@@ -74,7 +72,7 @@ class StaticRadius(Node):
         cv2.aruco_dict = cv2.aruco.getPredefinedDictionary(aruco_dict_type)
         parameters = cv2.aruco.DetectorParameters()
 
-        corners, ids, _ = cv2.aruco.detectMarkers(gray, cv2.aruco_dict)
+        corners, ids, _ = cv2.aruco.detectMarkers(gray, cv2.aruco_dict, parameters=parameters)
 
         marker_1 = None
         marker_2 = None
@@ -87,7 +85,7 @@ class StaticRadius(Node):
                     marker_2 = corners[i]
 
                 if ids[i] in [20, 21, 22, 23]:  # Фильтрация маркеров по ID
-                    rvec, tvec, markerPoints = cv2.aruco.estimatePoseSingleMarkers(corners[i], 4, matrix_coefficients,
+                    rvec, tvec, markerPoints = cv2.aruco.estimatePoseSingleMarkers(corners[i], 0.12 , matrix_coefficients,
                                                                                    distortion_coefficients)
 
                     cv2.aruco.drawDetectedMarkers(frame, corners)
@@ -116,35 +114,43 @@ class StaticRadius(Node):
                         self.marker_coordinates[11] = cY
 
 
-        if marker_1 is not None and marker_2 is not None:
-            rvec_1, tvec_1, _ = cv2.aruco.estimatePoseSingleMarkers(marker_1, 4, matrix_coefficients,
+        rvec_1, tvec_1, _ = cv2.aruco.estimatePoseSingleMarkers(marker_1, 0.07, matrix_coefficients,
                                                                       distortion_coefficients)
-            rvec_2, tvec_2, _ = cv2.aruco.estimatePoseSingleMarkers(marker_2, 4, matrix_coefficients,
+        rvec_2, tvec_2, _ = cv2.aruco.estimatePoseSingleMarkers(marker_2, 0.09, matrix_coefficients,
                                                                       distortion_coefficients)
 
-            # Отображение координат маркеров
+        # Отображение координат маркеров
+        if marker_1 is not None:
             cX_1 = float((marker_1[0][0][0] + marker_1[0][2][0]) / 2)
             cY_1 = float((marker_1[0][0][1] + marker_1[0][2][1]) / 2)
+            enem = Vector3()
+            enem.x = cX_1
+            enem.y = cY_1
+            self.enemy.publish(enem)
 
+        if marker_2 is not None:
             cX_2 = float((marker_2[0][0][0] + marker_2[0][2][0]) / 2)
             cY_2 = float((marker_2[0][0][1] + marker_2[0][2][1]) / 2)
-
             pose = Vector3()
             pose.x = cX_2
             pose.y = cY_2
             self.place.publish(pose)
+            #print(pose)
 
-            distance = np.linalg.norm(tvec_1 - tvec_2)
-            #print(distance)
-
-            obst = String()
-            if distance < 40:
-                obst.data = "stop_obstacle"
-                self.obstacle.publish(obst)
-            elif distance >= 40:
-                obst.data = "move"
-                self.obstacle.publish(obst)
-            print(tvec_2)
+        if marker_1 is not None and marker_2 is not None:
+            distance = np.linalg.norm(tvec_1[0][0][:2] - tvec_2[0][0][:2])
+        elif marker_2 is not None:
+            distance = 10000
+        else:
+            distance = 10000
+ 
+        obst = String()
+        if distance < 100:
+            obst.data = "stop_obstacle"
+            self.obstacle.publish(obst)
+        elif distance >= 100:
+            obst.data = "move"
+            self.obstacle.publish(obst)
 
         if all(self.marker_coordinates) and not self.message_displayed:
             self.all_markers_detected = True

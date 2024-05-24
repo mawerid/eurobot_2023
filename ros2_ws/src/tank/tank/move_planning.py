@@ -130,7 +130,7 @@ class MovePlanning(Node):
         resp = String()
         match msg.data:
             case "done": 
-                resp.data = "I moved to " + self.aim
+                resp.data = "I moved to aim"
                 self.planner_response.publish(resp)
             case "stop_obstacle":
                 resp.data = "Obstacle, I stopped"
@@ -197,8 +197,10 @@ class MovePlanning(Node):
         b6 = 0.5*((-self.static_aruco_dict[22][1] - k6 * self.static_aruco_dict[22][0]) 
                     + (-self.static_aruco_dict[21][1] - k6 * self.static_aruco_dict[21][0]))
 
-        right_point = (0.5*(-self.static_aruco_dict[22][1] - self.static_aruco_dict[20][1]) - b2)/k2
-        left_point = (0.5*(-self.static_aruco_dict[23][1] - self.static_aruco_dict[21][1]) - b1)/k1
+        right_point = ((0.5*(-self.static_aruco_dict[22][1] - self.static_aruco_dict[20][1]) - b2)/k2
+                                    + 0.1*(self.static_aruco_dict[22][0] - self.static_aruco_dict[23][0]))
+        left_point = ((0.5*(-self.static_aruco_dict[23][1] - self.static_aruco_dict[21][1]) - b1)/k1
+                                    - 0.1*(self.static_aruco_dict[22][0] - self.static_aruco_dict[23][0]))
         
         self.positions.update(
             {   
@@ -210,11 +212,11 @@ class MovePlanning(Node):
                 
                 "left base 2": [left_point,(-self.static_aruco_dict[23][1] - self.static_aruco_dict[21][1])/2],
 
-                "right base 2": [right_point,(-self.static_aruco_dict[22][1] - self.static_aruco_dict[20][1])/2],
+                "right base 2": [right_point + 100,(-self.static_aruco_dict[22][1] - self.static_aruco_dict[20][1])/2],
 
-                "right base 1": [right_point, k6*right_point + b6],
+                "right base 1": [right_point + 100, k6*right_point + b6],
 
-                "left base 3": [left_point, k6*left_point + b6],
+                "left base 3": [left_point + 100, k6*left_point + b6],
 
                 "right base 3": [right_point, k5*right_point + b5],
 
