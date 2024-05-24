@@ -19,7 +19,7 @@ class MainAlgorithm(Node):
         self.subscriptions 
         timer_period = 0.2
         self.timer = self.create_timer(timer_period, self.timer_callback)
-        self.command = None
+        self.command = ""
         self.pose_x = 0.0
         self.pose_y = 0.0
         self.angle = 0.0
@@ -42,18 +42,20 @@ class MainAlgorithm(Node):
                 self.command = None
                 if self.plants_on_board is not True:
                     com = String()
-                    com.data = "" 
-                #else:
-                 #   com =        
+                    com.data = "scan_space" 
+                    self.commander.publish(com)
+                else:
+                    com = String()
+                    com.data = 'Unload'       
             case None:
                 print('I am waiting static markers')
 
 
-    def timer_callback(self, msg):
+    def timer_callback(self):
         msg = String()
         msg.data = self.command
-        self.get_logger().info('Distance "%s"' % self.command_publish)
-        self.publisher_aim.publish(msg)
+        self.get_logger().info('Distance "%s"' % self.command)
+        self.commander.publish(msg)
 
     def pose_callback(self, msg):
         self.pose_x = msg.x

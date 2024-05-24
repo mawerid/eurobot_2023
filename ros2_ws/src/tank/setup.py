@@ -40,7 +40,9 @@ setup(
             'tank_camera = tank.tank_camera:main',
             'scanner = tank.scanner:main',
             'plant_grabbing = tank.plant_grabbing:main',
-            'after_the_stop = tank.after_the_stop:main'
+            'after_the_stop = tank.after_the_stop:main',
+            'main_algorithm = tank.main_algorithm:main'
+
             ],
 
     },
