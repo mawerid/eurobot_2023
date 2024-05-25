@@ -146,9 +146,9 @@ class MovePlanning(Node):
         })
 
     def path_count(self, aim):
-        r = math.sqrt((self.positions[aim][1] + self.tank_pose_y) ** 2 +
+        r = math.sqrt((self.positions[aim][1] - self.tank_pose_y) ** 2 +
                       (self.positions[aim][0] - self.tank_pose_x) ** 2)
-        phi = math.atan2(self.positions[aim][1] + self.tank_pose_y,
+        phi = math.atan2(self.positions[aim][1] - self.tank_pose_y,
                          self.positions[aim][0] - self.tank_pose_x)
         msg = Vector3()
         msg.x = r

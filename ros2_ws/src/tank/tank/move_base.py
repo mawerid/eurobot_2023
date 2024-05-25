@@ -48,7 +48,7 @@ class MoveBase(Node):
     def pose_callback(self, msg):
         self.pose_x = msg.position.x
         self.pose_y = msg.position.y
-        self.angle_z = Rotation.from_quat(msg.orientation).as_euler('zyx', degrees=True)[0]
+        self.angle_z = Rotation.from_quat(msg.orientation).as_euler('zyx')[0]
 
     def scan_callback(self, msg):
         if msg.data == 'rotate':
@@ -136,7 +136,7 @@ class MoveBase(Node):
     def action(self, msg):
         dif_angle = msg.y + self.angle_z  # self.imu_info + self.imu_correct
         if self.permit == 'move':
-            if msg.x > 0.01:
+            if msg.x > 0.1:
                 hside = max(abs(-self.pose_y - self.up), abs(-self.pose_y - self.down))
                 vside = max(abs(self.pose_x - self.left), abs(self.right - self.left))
                 if (msg.x > hside) and (msg.y >= 0) and (msg.y <= 180):
