@@ -6,6 +6,7 @@ from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Vector3, Pose
 from std_msgs.msg import String
 from std_msgs.msg import Float64
+import numpy as np
 
 height = 1
 width = 1.5
@@ -48,7 +49,7 @@ class MoveBase(Node):
     def pose_callback(self, msg):
         self.pose_x = msg.position.x
         self.pose_y = msg.position.y
-        self.angle_z = Rotation.from_quat(msg.orientation).as_euler('zyx', degrees=True)[0]
+        self.angle_z = Rotation.from_quat(np.array([msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w])).as_euler('zyx', degrees=True)[0]
 
     def scan_callback(self, msg):
         if msg.data == 'rotate':

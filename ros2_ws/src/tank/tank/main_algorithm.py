@@ -5,6 +5,7 @@ from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Pose
 from std_msgs.msg import String
+import numpy as np
 
 height = 1.0
 width = 1.5
@@ -61,7 +62,7 @@ class MainAlgorithm(Node):
     def pose_callback(self, msg):
         self.pose_x = msg.position.x
         self.pose_y = msg.position.y
-        self.angle = Rotation.from_quat(msg.orientation).as_euler('zyx', degrees=True)[0]
+        self.angle = Rotation.from_quat(np.array([msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w])).as_euler('zyx', degrees=True)[0]
 
 
 def main(args=None):

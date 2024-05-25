@@ -4,6 +4,7 @@ from geometry_msgs.msg import Vector3, Pose
 from std_msgs.msg import String
 from scipy.spatial.transform import Rotation
 import math
+import numpy as np
 
 
 class MovePlanning(Node):
@@ -120,7 +121,10 @@ class MovePlanning(Node):
         self.tank_pose_x = msg.position.x
         self.tank_pose_y = msg.position.y
 
-        self.tank_angle = Rotation.from_quat(msg.orientation).as_euler('zyx', degrees=True)[0]
+        self.tank_angle = Rotation.from_quat(
+            np.array([msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w])).as_euler('zyx',
+                                                                                                             degrees=True)[
+            0]
         print(self.tank_pose_x, self.tank_pose_y, self.tank_angle)
 
     def make_points(self):
