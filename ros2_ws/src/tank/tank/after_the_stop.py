@@ -3,6 +3,7 @@ import cv2
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Vector3, Pose, PoseStamped
+from scipy.spatial.transform import Rotation
 from std_msgs.msg import String
 
 
@@ -19,8 +20,8 @@ class AfterStop(Node):
         self.marker_21 = [0., 0., 0.]
         self.marker_22 = [0., 0., 0.]
         self.marker_23 = [0., 0., 0.]
-        self.our_robot = [0., 0., 0.]
-        self.enemy_robot = [0., 0., 0.]
+        self.our_robot = [0., 0., 0., 0.]
+        self.enemy_robot = [0., 0., 0., 0.]
 
     # принимаю координаты маркеров
     def static_aruco_info(self, msg):
@@ -44,13 +45,15 @@ class AfterStop(Node):
     # принимаю координаты робота и enemy
     def pose_callback(self, msg):
         self.our_robot[0] = 2
-        self.our_robot[1] = msg.x
-        self.our_robot[2] = msg.y
+        self.our_robot[1] = msg.position.x
+        self.our_robot[2] = msg.position.y
+        self.our_robot[3] = Rotation.from_quat(msg.orientation).as_euler('zyx')[0]
 
     def enemy_callback(self, msg):
         self.enemy_robot[0] = 1
-        self.enemy_robot[1] = msg.x
-        self.enemy_robot[2] = msg.y
+        self.enemy_robot[1] = msg.position.x
+        self.enemy_robot[2] = msg.position.y
+        self.enemy_robot[3] = Rotation.from_quat(msg.orientation).as_euler('zyx')[0]
 
     def act_decision(self, msg):
         if msg.data == "Obstacle, I stopped":
