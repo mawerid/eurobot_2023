@@ -8,20 +8,19 @@ from launch.conditions import IfCondition, UnlessCondition
 
 
 def generate_launch_description():
-    
     default_robot_launch_path = PathJoinSubstitution(
         [FindPackageShare('tank'), 'launch', 'default_tank.launch.py']
     )
     return LaunchDescription([
 
         DeclareLaunchArgument(
-            name='Pico 1', 
+            name='Pico 1',
             default_value='/dev/ttyACM0',
             description='Tank Pico 1'
         ),
 
         DeclareLaunchArgument(
-            name='Pico 2', 
+            name='Pico 2',
             default_value='/dev/ttyACM1',
             description='Tank Pico 2'
         ),
@@ -37,14 +36,14 @@ def generate_launch_description():
             executable='tank_camera',
             name='tank_camera',
         ),
-        
+
         Node(
             package='tank',
             executable='screen',
             name='screen',
         ),
 
-       IncludeLaunchDescription(
+        IncludeLaunchDescription(
             PythonLaunchDescriptionSource(default_robot_launch_path),
             launch_arguments={
                 'Pico 1': LaunchConfiguration("Pico 1"),

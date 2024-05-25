@@ -8,16 +8,15 @@ from launch.conditions import IfCondition
 
 
 def generate_launch_description():
-
     return LaunchDescription([
         DeclareLaunchArgument(
-            name='Pico 1', 
+            name='Pico 1',
             default_value='/dev/ttyACM0',
             description='Pico 1'
         ),
 
         DeclareLaunchArgument(
-            name='Pico 2', 
+            name='Pico 2',
             default_value='/dev/ttyACM1',
             description='Pico 2'
         ),

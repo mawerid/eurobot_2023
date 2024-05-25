@@ -16,7 +16,6 @@ class Scanner(Node):
         self.subscriber_imu = self.create_subscription(Imu, 'imu_topic', self.listener_callback, 10)
         self.subscriber_plant = self.create_subscription(Vector3, 'plant_id', self.plant_callback, 10)
         self.nearest_plant = self.create_publisher(Vector3, 'nearest_plant', 10)
-        self.subscriptions
         self.plant_dict = {}
         self.imu_info = 0
         self.start_rotate = 0

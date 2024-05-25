@@ -14,7 +14,6 @@ class PlantGrabbing(Node):
         self.screen_publisher = self.create_publisher(Vector3, 'screen_info', 10)
         self.publisher_response = self.create_publisher(String, 'main_response_topic', 10)
         self.command_listener = self.create_subscription(String, 'main_command_topic', self.act_decision, 10)
-        self.subscriptions
         self.count = 0.0
 
     def act_decision(self, msg):
