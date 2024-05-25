@@ -14,6 +14,10 @@ MAP_MARKERS = [20, 21, 22, 23]
 ROBOT_MARKER = 1
 ENEMY_MARKER = 2
 
+MIN_DISTANCE = 0.6
+MAP_MARKER_LENGTH = 0.7
+ROBOT_MARKER_LENGTH = 0.7
+
 
 class ArucoMapper(Node):
     def __init__(self):
@@ -31,7 +35,7 @@ class ArucoMapper(Node):
 
         self.intrinsic_camera = np.array([[1316.741948, 0.000000, 928.288568],
                                           [0.000000, 1344.516871, 544.438518],
-                                          [0.000000, 0.000000, 1.000000]])
+                                          [0.000000, 0.000000, 1.000000]], dtype=np.float32)
 
         self.distortion = np.array([[-0.162078],
                                     [7.725812],
@@ -46,7 +50,7 @@ class ArucoMapper(Node):
                                     [0.000000],
                                     [0.000000],
                                     [0.000000],
-                                    [0.000000]])
+                                    [0.000000]], dtype=np.float32)
 
         self.cap = cv2.VideoCapture(0)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 3840)
@@ -63,21 +67,14 @@ class ArucoMapper(Node):
         self.tfs_map_markers = [None for _ in range(MAP_MARKERS_COUNT)]
         self.map_build_flag = False
 
-    def image_callback(self):
-        ret, img = self.cap.read()
-
-        # annotated_frame = pose_estimation(frame, ARUCO_DICT[aruco_type], cameraMatrix, distCoeffs)
-        # cv2.imshow('Annotated Frame', annotated_frame)
-        self.pose_estimation(img, self.aruco_dict[self.aruco_type], self.intrinsic_camera, self.distortion)
-
     def calc_center(self):
 
         av_rotmat = np.zeros((3, 3))
         av_tvec = np.zeros((1, 3))
 
         for i in range(MAP_MARKERS_COUNT):
-            av_rotmat += Rotation.from_rotvec(self.tfs_map_markers[i][0][0][0]).as_matrix()
-            av_tvec += self.tfs_map_markers[i][1][0]
+            av_rotmat += Rotation.from_rotvec(self.tfs_map_markers[i][0]).as_matrix()
+            av_tvec += self.tfs_map_markers[i][1]
 
         av_rotmat = scipy.linalg.polar(av_rotmat / MAP_MARKERS_COUNT)[0]
         av_tvec /= MAP_MARKERS_COUNT
@@ -93,130 +90,90 @@ class ArucoMapper(Node):
 
         self.tf_cam2center = np.matmul(reverse, self.tf_cam2center)
 
-    def pose_estimation(self, frame, aruco_dict_type, matrix_coefficients, distortion_coefficients):
+    def calc_tf(self, marker):
+        rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(marker, ROBOT_MARKER_LENGTH,
+                                                            self.intrinsic_camera,
+                                                            self.distortion)
 
+        rot_mat = Rotation.from_rotvec(rvec[0]).as_matrix()[0]
+        tf_robo = np.array([[rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], tvec[0][0][0]],
+                            [rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], tvec[0][0][1]],
+                            [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec[0][0][2]],
+                            [0.0, 0.0, 0.0, 1.0]])
+
+        tf_robo = np.matmul(self.transform_cam2center, tf_robo)
+        R = Rotation.from_matrix(tf_robo[:3, :3]).as_quat()
+        tvec = tf_robo[:3, 3]
+
+        # Create Pose message
+        pose_msg = Pose()
+        pose_msg.position.x = tvec[0]
+        pose_msg.position.y = tvec[1]
+        pose_msg.position.z = tvec[2]
+        pose_msg.orientation.x = R[0]
+        pose_msg.orientation.y = R[1]
+        pose_msg.orientation.z = R[2]
+        pose_msg.orientation.w = R[3]  # Assume unit quaternion for simplicity
+
+        return tf_robo, pose_msg
+
+    def image_callback(self):
+        ret, frame = self.cap.read()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        aruco_dict = cv2.aruco.getPredefinedDictionary(aruco_dict_type)
-        parameters = cv2.aruco.DetectorParameters()
 
-        corners, ids, _ = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
+        corners, ids, _ = cv2.aruco.detectMarkers(gray, self.arucoDict, parameters=self.arucoParams)
 
-        marker_1 = None
-        marker_2 = None
+        robot_marker = None
+        enemy_marker = None
         map_corners = [None for _ in range(MAP_MARKERS_COUNT)]
-        tvec_1, tvec_2 = None, None
-        map_corners = [None, None, None, None]
 
-        tf_robo_1, tf_robo_2 = np.zeros((4, 4)), np.zeros((4, 4))
+        tf_robo, tf_enemy = np.zeros((4, 4)), np.zeros((4, 4))
 
         if len(corners) > 0:
             for i in range(len(ids)):
-                if ids[i] == 1:
-                    marker_1 = corners[i]
-                elif ids[i] == 2:
-                    marker_2 = corners[i]
-                elif ids[i] in [20, 21, 22, 23]:  # Фильтрация маркеров по ID
+                if ids[i] == ROBOT_MARKER:
+                    robot_marker = corners[i]
+                elif ids[i] == ENEMY_MARKER:
+                    enemy_marker = corners[i]
+                elif ids[i] in MAP_MARKERS:  # Фильтрация маркеров по ID
+                    for j in range(len(MAP_MARKERS)):
+                        if ids[i] == MAP_MARKERS[j]:
+                            map_corners[j] = corners[i]
+                            break
 
-                    if ids[i] == 20:
-                        map_corners[0] = corners[i]
-                    elif ids[i] == 21:
-                        map_corners[1] = corners[i]
-                    elif ids[i] == 22:
-                        map_corners[2] = corners[i]
-                    elif ids[i] == 23:
-                        map_corners[3] = corners[i]
-
-        if map_corners[0] is not None and map_corners[1] is not None and map_corners[2] is not None and map_corners[
-            3] is not None and not self.message_displayed:
-            self.map_build_flag = True
-            pose_msg = String()
-            # print("All markers detected:", self.all_markers_detected)
-            # print(self.marker_coordinates)
+        if sum(x is not None for x in map_corners) == MAP_MARKERS_COUNT and not self.map_build_flag:
             print(ids)
             for i in range(len(map_corners)):
-                rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(map_corners[i], 0.07, matrix_coefficients,
-                                                                    distortion_coefficients)
-                cv2.aruco.drawDetectedMarkers(frame, corners)
-                cv2.drawFrameAxes(frame, matrix_coefficients, distortion_coefficients, rvec, tvec, 0.01)
-                self.tfs_map_markers[i] = [rvec, tvec]
+                rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(map_corners[i], MAP_MARKER_LENGTH,
+                                                                    self.intrinsic_camera,
+                                                                    self.distortion)
+                self.tfs_map_markers[i] = [rvec[0][0], tvec[0]]
 
             self.calc_center()
-            pose_msg.data = "map_done"
-            self.static_aruco.publish(pose_msg)
-            self.message_displayed = True
+            self.map_build_flag = True
 
-        if marker_1 is not None:
-            rvec_1, tvec_1, _ = cv2.aruco.estimatePoseSingleMarkers(marker_1, 0.07, matrix_coefficients,
-                                                                    distortion_coefficients)
-            rot_mat = Rotation.from_rotvec(rvec_1[0]).as_matrix()[0]
-            tf_robo = np.array([[rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], tvec_1[0][0][0]],
-                                [rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], tvec_1[0][0][1]],
-                                [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_1[0][0][2]],
-                                [0.0, 0.0, 0.0, 1.0]])
+        if self.map_build_flag:
 
-            tf_new = np.matmul(self.tf_cam2center, tf_robo)
-            R = Rotation.from_matrix(tf_new[:3, :3]).as_quat()
-            tvec_1 = tf_new[:3, 3]
-            tf_robo_1 = np.matmul(self.transform_cam2center, tf_robo)
-            R = Rotation.from_matrix(tf_robo_1[:3, :3]).as_quat()
-            tvec_1 = tf_robo_1[:3, 3]
+            if robot_marker is not None:
+                tf_robo, pose_msg = self.calc_tf(robot_marker)
+                self.enemy_place.publish(pose_msg)
 
-            # Create Pose message
-            pose_msg = Pose()
-            pose_msg.position.x = tvec_1[0]
-            pose_msg.position.y = tvec_1[1]
-            pose_msg.position.z = tvec_1[2]
-            pose_msg.orientation.x = R[0]
-            pose_msg.orientation.y = R[1]
-            pose_msg.orientation.z = R[2]
-            pose_msg.orientation.w = R[3]  # Assume unit quaternion for simplicity
+            if enemy_marker is not None:
+                tf_enemy, pose_msg = self.calc_tf(enemy_marker)
+                self.robo_place.publish(pose_msg)
 
-            self.enemy_place.publish(pose_msg)
+            if robot_marker is not None and enemy_marker is not None:
+                new = tf_robo * np.linalg.inv(tf_enemy)
+                distance = np.linalg.norm(new[:3, 3])
+                print(distance)
 
-        if marker_2 is not None:
-            rvec_2, tvec_2, _ = cv2.aruco.estimatePoseSingleMarkers(marker_2, 0.07, matrix_coefficients,
-                                                                    distortion_coefficients)
-
-            rot_mat = Rotation.from_rotvec(rvec_2[0]).as_matrix()[0]
-            tf_robo = np.array([[rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], tvec_2[0][0][0]],
-                                [rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], tvec_2[0][0][1]],
-                                [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_2[0][0][2]],
-                                [0.0, 0.0, 0.0, 1.0]])
-
-            tf_robo_2 = np.matmul(self.transform_cam2center, tf_robo)
-            R = Rotation.from_matrix(tf_robo_2[:3, :3]).as_quat()
-            tvec_2 = tf_robo_2[:3, 3]
-            tf_new = np.matmul(self.tf_cam2center, tf_robo)
-            R = Rotation.from_matrix(tf_new[:3, :3]).as_quat()
-            tvec_2 = tf_new[:3, 3]
-
-            # Create Pose message
-            pose_msg = Pose()
-            pose_msg.position.x = tvec_2[0]
-            pose_msg.position.y = tvec_2[1]
-            pose_msg.position.z = tvec_2[2]
-            pose_msg.orientation.x = R[0]
-            pose_msg.orientation.y = R[1]
-            pose_msg.orientation.z = R[2]
-            pose_msg.orientation.w = R[3]  # Assume unit quaternion for simplicity
-
-            self.robo_place.publish(pose_msg)
-
-        if marker_1 is not None and marker_2 is not None and self.message_displayed:
-
-            new = tf_robo_1 * np.linalg.inv(tf_robo_2)
-
-            distance = np.linalg.norm(new[:3, 3])
-            print(distance)
-
-            obst = String()
-            if distance < 0.6:
-                obst.data = "stop_obstacle"
-                self.obstacle.publish(obst)
-            elif distance >= 0.6:
-                obst.data = "move"
-                self.obstacle.publish(obst)
-            # print(tvec_2)
+                obst = String()
+                if distance < MIN_DISTANCE:
+                    obst.data = "stop_obstacle"
+                    self.obstacle.publish(obst)
+                else:
+                    obst.data = "move"
+                    self.obstacle.publish(obst)
 
 
 def main(args=None):
