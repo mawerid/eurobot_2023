@@ -28,25 +28,29 @@ class MainAlgorithm(Node):
     def action(self, msg):
         match msg:
             case "scan_aruco_static_done":
-                if self.pose_x > width / 2:
-                    com = String()
-                    com.data = "to_right_pot"
-                    self.command = "to_right_pot"
-                    self.commander.publish(com)
-                else:
-                    com = String()
-                    com.data = "to_left_pot"
-                    self.command = "to_left_pot"
-                    self.commander.publish(com)
-            case "I moved to aim":
-                self.command = None
-                if self.plants_on_board is not True:
-                    com = String()
-                    com.data = ""
+                # if self.pose_x > width / 2:
+                #     com = String()
+                #     com.data = "to_right_pot"
+                #     self.command = "to_right_pot"
+                #     self.commander.publish(com)
+                # else:
+                #     com = String()
+                #     com.data = "to_left_pot"
+                #     self.command = "to_left_pot"
+                #     self.commander.publish(com)
+                com = String()
+                com.data = "to_left_base_1"
+                self.command = "to_left_base_1"
+                self.commander.publish(com)
+            #case "I moved to aim":
+                #self.command = None
+                #if self.plants_on_board is not True:
+                 #   com = String()
+                  #  com.data = ""
                     # else:
                 #   com =
-            case None:
-                print('I am waiting static markers')
+            #case None:
+               # print('I am waiting static markers')
 
     def timer_callback(self, msg):
         msg = String()
