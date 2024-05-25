@@ -48,7 +48,7 @@ class MoveBase(Node):
     def pose_callback(self, msg):
         self.pose_x = msg.position.x
         self.pose_y = msg.position.y
-        self.angle_z = Rotation.from_quat(msg.orientation).as_euler('zyx')[0]
+        self.angle_z = Rotation.from_quat(msg.orientation).as_euler('zyx', degrees=True)[0]
 
     def scan_callback(self, msg):
         if msg.data == 'rotate':

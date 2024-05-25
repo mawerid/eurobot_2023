@@ -55,8 +55,8 @@ class MainAlgorithm(Node):
     def timer_callback(self, msg):
         msg = String()
         msg.data = self.command
-        self.get_logger().info('Distance "%s"' % self.command_publish)
-        self.publisher_aim.publish(msg)
+        self.get_logger().info('Distance "%s"' % self.command)
+        self.commander.publish(msg)
 
     def pose_callback(self, msg):
         self.pose_x = msg.position.x
