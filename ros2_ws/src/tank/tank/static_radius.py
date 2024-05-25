@@ -7,8 +7,15 @@ import scipy
 from std_msgs.msg import String
 from geometry_msgs.msg import Pose
 
+TIMER_DELAY = 0.1
+MAP_MARKERS_COUNT = 4
 
-class StaticRadius(Node):
+MAP_MARKERS = [20, 21, 22, 23]
+ROBOT_MARKER = 1
+ENEMY_MARKER = 2
+
+
+class ArucoMapper(Node):
     def __init__(self):
         super().__init__('static_radius')
 
@@ -45,25 +52,18 @@ class StaticRadius(Node):
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 3840)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 2160)
 
-        self.static_aruco = self.create_publisher(String, 'static_aruco', 10)
         self.robo_place = self.create_publisher(Pose, 'robot_place', 10)
         self.enemy_place = self.create_publisher(Pose, 'enemy_place', 10)
         self.obstacle = self.create_publisher(String, 'obstacle_info', 10)
 
-        self.create_timer(0.01, self.image_callback)
+        self.create_timer(TIMER_DELAY, self.image_callback)
 
-        self.transform_cam2center = np.zeros((4, 4))
-
-        self.map_markers = [[None, None], [None, None], [None, None], [None, None]]
-
-        self.all_markers_detected = False
-        self.message_displayed = False
+        self.tf_cam2center = np.zeros((4, 4))
+        self.tfs_map_markers = [None for _ in range(MAP_MARKERS_COUNT)]
+        self.map_build_flag = False
 
     def image_callback(self):
         ret, img = self.cap.read()
-
-        # annotated_frame = pose_estimation(frame, ARUCO_DICT[aruco_type], cameraMatrix, distCoeffs)
-        # cv2.imshow('Annotated Frame', annotated_frame)
         self.pose_estimation(img, self.aruco_dict[self.aruco_type], self.intrinsic_camera, self.distortion)
 
     def calc_center(self):
@@ -71,22 +71,23 @@ class StaticRadius(Node):
         av_rotmat = np.zeros((3, 3))
         av_tvec = np.zeros((1, 3))
 
-        for i in range(4):
-            av_rotmat += Rotation.from_rotvec(self.map_markers[i][0][0][0]).as_matrix()
-            av_tvec += self.map_markers[i][1][0]
+        for i in range(MAP_MARKERS_COUNT):
+            av_rotmat += Rotation.from_rotvec(self.tfs_map_markers[i][0][0][0]).as_matrix()
+            av_tvec += self.tfs_map_markers[i][1][0]
 
-        av_rotmat = scipy.linalg.polar(av_rotmat / 4)[0]
-        av_tvec /= 4
+        av_rotmat = scipy.linalg.polar(av_rotmat / MAP_MARKERS_COUNT)[0]
+        av_tvec /= MAP_MARKERS_COUNT
 
-        reverse = np.array([[-1, 0, 0],
-                            [0, 1, 0],
-                            [0, 0, 1]])
+        self.tf_cam2center[:3, :3] = av_rotmat
+        self.tf_cam2center[:3, 3] = av_tvec
+        self.tf_cam2center[3, 3] = 1.0
 
-        av_rotmat = np.matmul(reverse, av_rotmat)
+        reverse = np.array([[-1, 0, 0, 0],
+                            [0, 1, 0, 0],
+                            [0, 0, 1, 0],
+                            [0, 0, 0, 1]])
 
-        self.transform_cam2center[:3, :3] = av_rotmat
-        self.transform_cam2center[:3, 3] = av_tvec
-        self.transform_cam2center[3, 3] = 1.0
+        self.tf_cam2center = np.matmul(reverse, self.tf_cam2center)
 
     def pose_estimation(self, frame, aruco_dict_type, matrix_coefficients, distortion_coefficients):
 
@@ -98,9 +99,8 @@ class StaticRadius(Node):
 
         marker_1 = None
         marker_2 = None
-        map_corners = [None, None, None, None]
-
-        tvec_1, tvec_2 = np.array([-1., -1., -1.]), np.array([-1., -1., -1.])
+        map_corners = [None for _ in range(MAP_MARKERS_COUNT)]
+        tvec_1, tvec_2 = None, None
 
         if len(corners) > 0:
             for i in range(len(ids)):
@@ -121,7 +121,7 @@ class StaticRadius(Node):
 
         if map_corners[0] is not None and map_corners[1] is not None and map_corners[2] is not None and map_corners[
             3] is not None and not self.message_displayed:
-            self.all_markers_detected = True
+            self.map_build_flag = True
             pose_msg = String()
             # print("All markers detected:", self.all_markers_detected)
             # print(self.marker_coordinates)
@@ -131,7 +131,7 @@ class StaticRadius(Node):
                                                                     distortion_coefficients)
                 cv2.aruco.drawDetectedMarkers(frame, corners)
                 cv2.drawFrameAxes(frame, matrix_coefficients, distortion_coefficients, rvec, tvec, 0.01)
-                self.map_markers[i] = [rvec, tvec]
+                self.tfs_map_markers[i] = [rvec, tvec]
 
             self.calc_center()
             pose_msg.data = "Map done"
@@ -147,7 +147,7 @@ class StaticRadius(Node):
                                 [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_1[0][2]],
                                 [0.0, 0.0, 0.0, 1.0]])
 
-            tf_new = np.matmul(self.transform_cam2center, tf_robo)
+            tf_new = np.matmul(self.tf_cam2center, tf_robo)
             R = Rotation.from_matrix(tf_new[:3, :3]).as_quat()
             tvec_1 = tf_new[:3, 3]
 
@@ -173,7 +173,7 @@ class StaticRadius(Node):
                                 [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_2[0][2]],
                                 [0.0, 0.0, 0.0, 1.0]])
 
-            tf_new = np.matmul(self.transform_cam2center, tf_robo)
+            tf_new = np.matmul(self.tf_cam2center, tf_robo)
             R = Rotation.from_matrix(tf_new[:3, :3]).as_quat()
             tvec_2 = tf_new[:3, 3]
 
@@ -205,10 +205,10 @@ class StaticRadius(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    static_radius = StaticRadius()
+    mapper = ArucoMapper()
 
-    rclpy.spin(static_radius)
-    static_radius.destroy_node()
+    rclpy.spin(mapper)
+    mapper.destroy_node()
     rclpy.shutdown()
 
 
