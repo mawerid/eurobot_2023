@@ -3,8 +3,8 @@ from rclpy.node import Node
 import numpy as np
 import cv2
 from scipy.spatial.transform import Rotation
-from std_msgs.msg import String, Header
-from geometry_msgs.msg import PoseStamped, Pose
+from std_msgs.msg import String
+from geometry_msgs.msg import Pose
 
 
 class StaticRadius(Node):
@@ -44,7 +44,7 @@ class StaticRadius(Node):
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
         # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 108)
 
-        self.static_aruco = self.create_publisher(PoseStamped, 'static_aruco', 10)
+        self.static_aruco = self.create_publisher(String, 'static_aruco', 10)
         self.robo_place = self.create_publisher(Pose, 'robot_place', 10)
         self.enemy_place = self.create_publisher(Pose, 'enemy_place', 10)
         self.obstacle = self.create_publisher(String, 'obstacle_info', 10)
@@ -93,6 +93,8 @@ class StaticRadius(Node):
         marker_2 = None
         map_markers = [None, None, None, None]
 
+        tvec_1, tvec_2 = np.array([-1., -1., -1.]), np.array([-1., -1., -1.])
+
         if len(corners) > 0:
             for i in range(len(ids)):
                 if ids[i] == 1:
@@ -110,12 +112,9 @@ class StaticRadius(Node):
                     elif ids[i] == 23:
                         map_markers[3] = corners[i]
 
-        if marker_1 is not None and marker_2 is not None:
+        if marker_1 is not None:
             rvec_1, tvec_1, _ = cv2.aruco.estimatePoseSingleMarkers(marker_1, 0.05, matrix_coefficients,
                                                                     distortion_coefficients)
-            rvec_2, tvec_2, _ = cv2.aruco.estimatePoseSingleMarkers(marker_2, 0.05, matrix_coefficients,
-                                                                    distortion_coefficients)
-
             rot_mat = Rotation.from_rotvec(rvec_1).as_matrix()
             tf_robo = np.array([[rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], tvec_1[0][0]],
                                 [rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], tvec_1[0][1]],
@@ -126,7 +125,7 @@ class StaticRadius(Node):
             R = Rotation.from_matrix(tf_new[:3, :3]).as_quat(canonical=True)
             tvec_1 = tf_new[:3, 3]
 
-            # Create PoseStamped message
+            # Create Pose message
             pose_msg = Pose()
             pose_msg.position.x = tvec_1[0]
             pose_msg.position.y = tvec_1[1]
@@ -138,6 +137,10 @@ class StaticRadius(Node):
 
             self.enemy_place.publish(pose_msg)
 
+        if marker_2 is not None:
+            rvec_2, tvec_2, _ = cv2.aruco.estimatePoseSingleMarkers(marker_2, 0.05, matrix_coefficients,
+                                                                    distortion_coefficients)
+
             rot_mat = Rotation.from_rotvec(rvec_2).as_matrix()
             tf_robo = np.array([[rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], tvec_2[0][0]],
                                 [rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], tvec_2[0][1]],
@@ -148,7 +151,7 @@ class StaticRadius(Node):
             R = Rotation.from_matrix(tf_new[:3, :3]).as_quat(canonical=True)
             tvec_2 = tf_new[:3, 3]
 
-            # Create PoseStamped message
+            # Create Pose message
             pose_msg = Pose()
             pose_msg.position.x = tvec_2[0]
             pose_msg.position.y = tvec_2[1]
@@ -160,6 +163,7 @@ class StaticRadius(Node):
 
             self.robo_place.publish(pose_msg)
 
+        if tvec_1.sum() >= 0 and tvec_2.sum() >= 0:
             distance = np.linalg.norm(tvec_1 - tvec_2)
             # print(distance)
 
@@ -174,38 +178,20 @@ class StaticRadius(Node):
 
         if all(map_markers) and not self.message_displayed:
             self.all_markers_detected = True
-            pose_msg = PoseStamped()
+            pose_msg = String()
             # print("All markers detected:", self.all_markers_detected)
             # print(self.marker_coordinates)
             print(ids)
             for i in range(len(map_markers)):
                 rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners[i], 0.07, matrix_coefficients,
                                                                     distortion_coefficients)
-
                 cv2.aruco.drawDetectedMarkers(frame, corners)
-
                 cv2.drawFrameAxes(frame, matrix_coefficients, distortion_coefficients, rvec, tvec, 0.01)
-
-                R = Rotation.from_rotvec(rvec).as_quat(canonical=True)
-
-                pose_msg.header = Header()
-                pose_msg.header.stamp = self.get_clock().now().to_msg()
-                pose_msg.header.frame_id = f'{20 + i}'  # Modify this frame_id based on your setup
-                pose_msg.pose.position.x = tvec[0]
-                pose_msg.pose.position.y = tvec[1]
-                pose_msg.pose.position.z = tvec[2]
-                pose_msg.pose.orientation.x = R[0]
-                pose_msg.pose.orientation.y = R[1]
-                pose_msg.pose.orientation.z = R[2]
-                pose_msg.pose.orientation.w = R[3]  # Assume unit quaternion for simplicity
-
-                # debug
-                print(pose_msg)
-
                 self.map_markers[i] = [rvec, tvec]
-                self.static_aruco.publish(pose_msg)
 
             self.calc_center()
+            pose_msg.data = "Map done"
+            self.static_aruco.publish(pose_msg)
             self.message_displayed = True
 
 
