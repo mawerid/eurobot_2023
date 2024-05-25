@@ -11,15 +11,24 @@ from launch_ros.substitutions import FindPackageShare
 def generate_launch_description():
 
     move_robot_launch_path = PathJoinSubstitution(
-        [FindPackageShare('tank'), 'launch', 'move_base.launch.py']
+        [FindPackageShare('tank'), 'launch', 'move_base.launch.py'])
     bringup_robot_launch_path = PathJoinSubstitution(
-        [FindPackageShare('tank'), 'launch', 'tank_bringup.launch.py']
+        [FindPackageShare('tank'), 'launch', 'tank_bringup.launch.py'])
+    
     return LaunchDescription([
         Node(
             package='tank',
-            executable='move_base',
-            name='move_base',
+            executable='main_algorithm',
+            name='main_algorithm',
+        ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(move_robot_launch_path),
+
+        ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(bringup_robot_launch_path),
+
         ),
         
-    )
+    
     ])

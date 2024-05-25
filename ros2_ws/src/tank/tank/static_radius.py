@@ -35,24 +35,25 @@ class ArucoMapper(Node):
         self.arucoDict = cv2.aruco.getPredefinedDictionary(self.aruco_dict[self.aruco_type])
         self.arucoParams = cv2.aruco.DetectorParameters()
 
-        self.intrinsic_camera = np.array([[1316.741948, 0.000000, 928.288568],
-                                          [0.000000, 1344.516871, 544.438518],
-                                          [0.000000, 0.000000, 1.000000]], dtype=np.float32)
+        self.intrinsic_camera = np.array([[ 1572.512703,  0.000000,  1892.212752],
+        [ 0.000000,  1570.878744,  1107.524273],
+        [ 0.000000,  0.000000,  1.000000]], dtype=np.float32)
 
-        self.distortion = np.array([[-0.162078],
-                                    [7.725812],
-                                    [0.000708],
-                                    [-0.002309],
-                                    [-0.192252],
-                                    [0.096461],
-                                    [7.558903],
-                                    [2.387815],
-                                    [0.000000],
-                                    [0.000000],
-                                    [0.000000],
-                                    [0.000000],
-                                    [0.000000],
-                                    [0.000000]], dtype=np.float32)
+        self.distortion = np.array([[-4.455178],
+        [ 6.454582],
+        [-0.000104],
+        [ 0.000088],
+        [-0.131327],
+        [-4.435619],
+        [ 6.366330],
+        [-0.013529],
+        [ 0.000000],
+        [ 0.000000],
+        [ 0.000000],
+        [ 0.000000],
+        [ 0.000000],
+        [ 0.000000]], dtype=np.float32)
+    
 
         self.cap = cv2.VideoCapture(0)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 3840)
@@ -87,12 +88,12 @@ class ArucoMapper(Node):
         self.tf_cam2center[:3, 3] = av_tvec
         self.tf_cam2center[3, 3] = 1.0
 
-        reverse = np.array([[-1, 0, 0, 0],
-                            [0, 1, 0, 0],
-                            [0, 0, 1, 0],
-                            [0, 0, 0, 1]])
+        # reverse = np.array([[-1, 0, 0, 0],
+        #                     [0, 1, 0, 0],
+        #                     [0, 0, 1, 0],
+        #                     [0, 0, 0, 1]])
 
-        self.tf_cam2center = np.matmul(reverse, self.tf_cam2center)
+        # self.tf_cam2center = np.matmul(reverse, self.tf_cam2center)
 
     def calc_tf(self, marker):
         rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(marker, ROBOT_MARKER_LENGTH,
@@ -148,19 +149,28 @@ class ArucoMapper(Node):
                             map_corners[j] = corners[i]
                             break
 
+        #print("HELLO")
+        #print(x is not None for x in map_corners)
         if sum(x is not None for x in map_corners) == MAP_MARKERS_COUNT and not self.map_build_flag:
             print(ids)
             for i in range(len(map_corners)):
                 rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(map_corners[i], MAP_MARKER_LENGTH,
                                                                     self.intrinsic_camera,
                                                                     self.distortion)
+                
+                # cv2.drawMarker(frame, map_corners[i], color='r')
+
+                # print(rvec[0][0])
+                # print(tvec[0])
                 self.tfs_map_markers[i] = [rvec[0][0], tvec[0]]
 
             self.calc_center()
+            #print("HELLO")
             rvec = Rotation.from_matrix(self.tf_cam2center[:3, :3]).as_rotvec()
             tvec = self.tf_cam2center[:3, 3]
-            cv2.drawFrameAxes(frame, self.intrinsic_camera, self.distortion, rvec, tvec, 0.1)
+            cv2.drawFrameAxes(frame, self.intrinsic_camera, self.distortion, rvec, tvec, 0.5)
             cv2.imwrite("map.png", frame)
+            #print("HELLO")
 
             self.map_build_flag = True
 
@@ -175,8 +185,9 @@ class ArucoMapper(Node):
                 self.robo_place.publish(pose_msg)
 
             if robot_marker is not None and enemy_marker is not None:
-                new = tf_robo * np.linalg.inv(tf_enemy)
-                distance = np.linalg.norm(new[:3, 3])
+                # new = tf_robo * np.linalg.inv(tf_enemy)
+                # distance = np.linalg.norm(new[:3, 3])
+                distance = np.linalg.norm(tf_robo[:3, 3] - tf_enemy[:3, 3])
 
                 self.current_distance.append(distance)
                 if len(self.current_distance) == DISTANCE_BUFFER_SIZE:
