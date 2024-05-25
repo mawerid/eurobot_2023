@@ -5,8 +5,6 @@ from std_msgs.msg import String
 from scipy.spatial.transform import Rotation
 import math
 
-area_width = 1500
-area_length = 800
 
 
 class MovePlanning(Node):

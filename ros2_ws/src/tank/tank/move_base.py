@@ -7,8 +7,8 @@ from geometry_msgs.msg import Vector3, Pose
 from std_msgs.msg import String
 from std_msgs.msg import Float64
 
-height = 800
-width = 1500
+height = 1
+width = 1.5
 
 
 class MoveBase(Node):
@@ -27,10 +27,10 @@ class MoveBase(Node):
         self.imu_info = 0
         self.imu_correct = 0
         self.vel = Twist()
-        self.up = 0
+        self.up = height
         self.down = -height
         self.right = width
-        self.left = 0
+        self.left = -width
         self.pose_x = 0
         self.pose_y = 0
         self.angle_z = 0
@@ -136,9 +136,9 @@ class MoveBase(Node):
     def action(self, msg):
         dif_angle = msg.y + self.angle_z  # self.imu_info + self.imu_correct
         if self.permit == 'move':
-            if msg.x > 10:
+            if msg.x > 0.1:
                 hside = max(abs(-self.pose_y - self.up), abs(-self.pose_y - self.down))
-                vside = max(abs(self.pose_x - self.left), abs(self.right))
+                vside = max(abs(self.pose_x - self.left), abs(self.right - self.left))
                 if (msg.x > hside) and (msg.y >= 0) and (msg.y <= 180):
                     self.make_command(dif_angle=dif_angle - 180)
                 elif (msg.x > hside) and (msg.y >= -180) and (msg.y < 0):
