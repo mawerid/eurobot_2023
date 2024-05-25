@@ -18,7 +18,7 @@ MIN_DISTANCE = 0.6
 MAP_MARKER_LENGTH = 0.07
 ROBOT_MARKER_LENGTH = 0.07
 
-DISTANCE_BUFFER_SIZE = 10
+DISTANCE_BUFFER_SIZE = 5
 
 
 class ArucoMapper(Node):
@@ -69,7 +69,7 @@ class ArucoMapper(Node):
         self.tfs_map_markers = [None for _ in range(MAP_MARKERS_COUNT)]
         self.map_build_flag = False
 
-        self.current_distance = np.zeros((1, DISTANCE_BUFFER_SIZE))
+        self.current_distance = []
 
     def calc_center(self):
 
@@ -87,12 +87,12 @@ class ArucoMapper(Node):
         self.tf_cam2center[:3, 3] = av_tvec
         self.tf_cam2center[3, 3] = 1.0
 
-        # reverse = np.array([[-1, 0, 0, 0],
-        #                     [0, 1, 0, 0],
-        #                     [0, 0, 1, 0],
-        #                     [0, 0, 0, 1]])
-        #
-        # self.tf_cam2center = np.matmul(reverse, self.tf_cam2center)
+        reverse = np.array([[-1, 0, 0, 0],
+                            [0, 1, 0, 0],
+                            [0, 0, 1, 0],
+                            [0, 0, 0, 1]])
+
+        self.tf_cam2center = np.matmul(reverse, self.tf_cam2center)
 
     def calc_tf(self, marker):
         rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(marker, ROBOT_MARKER_LENGTH,
@@ -157,6 +157,7 @@ class ArucoMapper(Node):
                 self.tfs_map_markers[i] = [rvec[0][0], tvec[0]]
 
             self.calc_center()
+
             self.map_build_flag = True
 
         if self.map_build_flag:
@@ -172,15 +173,19 @@ class ArucoMapper(Node):
             if robot_marker is not None and enemy_marker is not None:
                 new = tf_robo * np.linalg.inv(tf_enemy)
                 distance = np.linalg.norm(new[:3, 3])
-                print(distance)
 
-                obst = String()
-                if distance < MIN_DISTANCE:
-                    obst.data = "stop_obstacle"
-                    self.obstacle.publish(obst)
-                else:
-                    obst.data = "move"
-                    self.obstacle.publish(obst)
+                self.current_distance.append(distance)
+                if len(self.current_distance) == DISTANCE_BUFFER_SIZE:
+                    distance = sum(self.current_distance) / len(self.current_distance)
+                    print(distance)
+                    obst = String()
+                    if distance < MIN_DISTANCE:
+                        obst.data = "stop_obstacle"
+                        self.obstacle.publish(obst)
+                    else:
+                        obst.data = "move"
+                        self.obstacle.publish(obst)
+                    self.current_distance.pop(0)
 
 
 def main(args=None):
