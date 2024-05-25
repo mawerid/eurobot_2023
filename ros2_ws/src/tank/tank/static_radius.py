@@ -41,8 +41,8 @@ class StaticRadius(Node):
                                     [0.000000]])
 
         self.cap = cv2.VideoCapture(0)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-        # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 108)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 4000)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 2256)
 
         self.static_aruco = self.create_publisher(String, 'static_aruco', 10)
         self.robo_place = self.create_publisher(Pose, 'robot_place', 10)
@@ -183,7 +183,7 @@ class StaticRadius(Node):
             # print(self.marker_coordinates)
             print(ids)
             for i in range(len(map_markers)):
-                rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners[i], 0.07, matrix_coefficients,
+                rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners[i], 0.12, matrix_coefficients,
                                                                     distortion_coefficients)
                 cv2.aruco.drawDetectedMarkers(frame, corners)
                 cv2.drawFrameAxes(frame, matrix_coefficients, distortion_coefficients, rvec, tvec, 0.01)
