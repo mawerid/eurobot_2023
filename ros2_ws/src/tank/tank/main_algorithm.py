@@ -20,15 +20,15 @@ class MainAlgorithm(Node):
         self.robot_place = self.create_subscription(Pose, 'robot_place', self.pose_callback, 10)
         timer_period = 0.2
         self.timer = self.create_timer(timer_period, self.timer_callback)
-        self.command = None
+        self.command = ""
         self.pose_x = 0.0
         self.pose_y = 0.0
         self.angle = 0.0
         self.plants_on_board = False
 
     def action(self, msg):
-        match msg:
-            case "scan_aruco_static_done":
+        match msg.data:
+            case "map_done":
                 # if self.pose_x > width / 2:
                 #     com = String()
                 #     com.data = "to_right_pot"
@@ -53,10 +53,10 @@ class MainAlgorithm(Node):
             #case None:
                # print('I am waiting static markers')
 
-    def timer_callback(self, msg):
+    def timer_callback(self):
         msg = String()
         msg.data = self.command
-        self.get_logger().info('Distance "%s"' % self.command)
+        #self.get_logger().info('Distance "%s"' % self.command)
         self.commander.publish(msg)
 
     def pose_callback(self, msg):

@@ -98,9 +98,9 @@ class MovePlanning(Node):
                 # self.planner_response.publish(ans)
 
     def static_aruco_info(self, msg):
-        if msg.data == "Map done":
+        if msg.data == "map_done":
             ans = String()
-            ans.data = "scan_aruco_static_done"
+            ans.data = "map_done"
             self.planner_response.publish(ans)
 
     def response_callback(self, msg):
