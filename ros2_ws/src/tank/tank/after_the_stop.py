@@ -18,10 +18,10 @@ class AfterStop(Node):
         self.our_robot = [0., 0., 0., 0.]  # заполняем позже
         self.enemy_robot = [0., 0., 0., 0.]  # заполняем позже
         self.center = [0., 0.]
-        self.up = 1000.
-        self.down = -1000.
-        self.left = -1500.
-        self.right = 1500.
+        self.up = 1.
+        self.down = -1.
+        self.left = -1.5
+        self.right = 1.5
 
     # принимаю координаты робота и enemy
     def pose_callback(self, msg):
