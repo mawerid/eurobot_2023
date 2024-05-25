@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import Vector3, Pose, PoseStamped
+from geometry_msgs.msg import Vector3, Pose
 from std_msgs.msg import String
 from scipy.spatial.transform import Rotation
 import math
@@ -14,7 +14,7 @@ class MovePlanning(Node):
     def __init__(self):
         super().__init__('move_planning')
         self.command_listener = self.create_subscription(String, 'main_command_topic', self.act_decision, 10)
-        self.static_aruco_sub = self.create_subscription(PoseStamped, 'static_aruco', self.static_aruco_info, 10)
+        self.static_aruco_sub = self.create_subscription(String, 'static_aruco', self.static_aruco_info, 10)
         self.robot_place = self.create_subscription(Pose, 'robot_place', self.pose_callback, 10)
         self.info_from_mv = self.create_subscription(String, 'mv_base_resp', self.response_callback, 10)
         self.planner_response = self.create_publisher(String, 'main_response_topic', 10)
@@ -100,29 +100,11 @@ class MovePlanning(Node):
                 # self.planner_response.publish(ans)
 
     def static_aruco_info(self, msg):
-        if msg.x == 20:
-            self.static_aruco_dict.update({
-                20: [msg.y, msg.z],
-            })
-            self.count += 1
-        if msg.x == 21:
-            self.static_aruco_dict.update({
-                21: [msg.y, msg.z],
-            })
-            self.count += 1
-        if msg.x == 22:
-            self.static_aruco_dict.update({
-                22: [msg.y, msg.z],
-            })
-            self.count += 1
-        if msg.x == 23:
-            self.static_aruco_dict.update({
-                23: [msg.y, msg.z],
-            })
-            self.count += 1
-        print(self.static_aruco_dict)
-        if self.count == 4:
-            self.make_points()
+        if msg.data == "Map done":
+            ans = String()
+            ans.data = "scan_aruco_static_done"
+            self.planner_response.publish(ans)
+
 
     def response_callback(self, msg):
         self.task_condition = msg.data
@@ -147,90 +129,27 @@ class MovePlanning(Node):
 
     def make_points(self):
 
-        # lines 3, 4
-        k1_3 = (self.static_aruco_dict[23][1] -
-                self.static_aruco_dict[22][1]) / (self.static_aruco_dict[23][1]
-                                                  - self.static_aruco_dict[22][1])
+        self.positions.update
+        ({
+            "left scan place": [-780,0],
 
-        k1_4 = (self.static_aruco_dict[21][1] -
-                self.static_aruco_dict[20][1]) / (self.static_aruco_dict[21][0]
-                                                  - self.static_aruco_dict[20][0])
+            "right scan place": [780, 0],
 
-        k34 = (k1_3 + k1_4) / 2
+            "left base 2": [-1225, 0],
 
-        b3 = 0.5 * ((self.static_aruco_dict[23][1] - k34 * self.static_aruco_dict[23][0])
-                    + (self.static_aruco_dict[22][1] - k34 * self.static_aruco_dict[22][0]))
+            "right base 2": [1225,0],
 
-        b4 = 0.5 * ((self.static_aruco_dict[21][1] - k34 * self.static_aruco_dict[21][0])
-                    + (self.static_aruco_dict[20][1] - k34 * self.static_aruco_dict[20][0]))
+            "right base 1": [1225, 775],
 
-        # lines 1, 2
+            "left base 3": [-1225, -775],
 
-        k1 = -1 * (self.static_aruco_dict[23][1] -
-                   self.static_aruco_dict[21][1]) / (self.static_aruco_dict[23][0]
-                                                     - self.static_aruco_dict[21][0])
+            "right base 3": [1225, -775],
 
-        k2 = -1 * (self.static_aruco_dict[22][1] -
-                   self.static_aruco_dict[20][1]) / (self.static_aruco_dict[22][0]
-                                                     - self.static_aruco_dict[20][0])
+            "left base 1": [-1225, 775],
 
-        b1 = 0.5 * ((-self.static_aruco_dict[23][1] - k1 * self.static_aruco_dict[23][0])
-                    + (-self.static_aruco_dict[21][1] - k1 * self.static_aruco_dict[21][0]))
+            "center": [0,0]
+        })
 
-        b2 = 0.5 * ((-self.static_aruco_dict[22][1] - k2 * self.static_aruco_dict[22][0])
-                    + (-self.static_aruco_dict[20][1] - k2 * self.static_aruco_dict[20][0]))
-
-        # lines 5,6
-
-        k5 = (-self.static_aruco_dict[23][1] +
-              self.static_aruco_dict[20][1]) / (self.static_aruco_dict[23][0]
-                                                - self.static_aruco_dict[20][0])
-
-        k6 = (-self.static_aruco_dict[22][1] +
-              self.static_aruco_dict[21][1]) / (self.static_aruco_dict[22][0]
-                                                - self.static_aruco_dict[21][0])
-
-        b5 = 0.5 * ((-self.static_aruco_dict[23][1] - k5 * self.static_aruco_dict[23][0])
-                    + (-self.static_aruco_dict[20][1] - k5 * self.static_aruco_dict[20][0]))
-
-        b6 = 0.5 * ((-self.static_aruco_dict[22][1] - k6 * self.static_aruco_dict[22][0])
-                    + (-self.static_aruco_dict[21][1] - k6 * self.static_aruco_dict[21][0]))
-
-        right_point = ((0.5 * (-self.static_aruco_dict[22][1] - self.static_aruco_dict[20][1]) - b2) / k2
-                       + 0.1 * (self.static_aruco_dict[22][0] - self.static_aruco_dict[23][0]))
-        left_point = ((0.5 * (-self.static_aruco_dict[23][1] - self.static_aruco_dict[21][1]) - b1) / k1
-                      - 0.1 * (self.static_aruco_dict[22][0] - self.static_aruco_dict[23][0]))
-
-        self.positions.update(
-            {
-                "left scan place": [(0.5 * (-self.static_aruco_dict[23][1] - self.static_aruco_dict[21][1]) - b1) / k1,
-                                    (-self.static_aruco_dict[23][1] - self.static_aruco_dict[21][1]) / 2],
-
-                "right scan place": [(0.5 * (-self.static_aruco_dict[22][1] - self.static_aruco_dict[20][1]) - b2) / k2,
-                                     (-self.static_aruco_dict[22][1] - self.static_aruco_dict[20][1]) / 2],
-
-                "left base 2": [left_point, (-self.static_aruco_dict[23][1] - self.static_aruco_dict[21][1]) / 2],
-
-                "right base 2": [right_point + 100,
-                                 (-self.static_aruco_dict[22][1] - self.static_aruco_dict[20][1]) / 2],
-
-                "right base 1": [right_point + 100, k6 * right_point + b6],
-
-                "left base 3": [left_point + 100, k6 * left_point + b6],
-
-                "right base 3": [right_point, k5 * right_point + b5],
-
-                "left base 1": [left_point, k5 * left_point + b5],
-
-                "center": [0.5 * (0.5 * (self.static_aruco_dict[21][0] + self.static_aruco_dict[20][0])
-                                  + (0.5 * (self.static_aruco_dict[23][0] + self.static_aruco_dict[22][0]))),
-                           0.5 * (-0.5 * (self.static_aruco_dict[23][1] + self.static_aruco_dict[21][1])
-                                  + (-0.5 * (self.static_aruco_dict[20][1] + self.static_aruco_dict[22][1])))]
-            })
-        print(self.positions)
-        ans = String()
-        ans.data = "scan_aruco_static_done"
-        self.planner_response.publish(ans)
 
     def path_count(self, aim):
         r = math.sqrt((self.positions[aim][1] + self.tank_pose_y) ** 2 +
