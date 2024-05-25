@@ -6,7 +6,6 @@ from scipy.spatial.transform import Rotation
 import math
 
 
-
 class MovePlanning(Node):
 
     def __init__(self):
@@ -103,7 +102,6 @@ class MovePlanning(Node):
             ans.data = "scan_aruco_static_done"
             self.planner_response.publish(ans)
 
-
     def response_callback(self, msg):
         self.task_condition = msg.data
         resp = String()
@@ -122,20 +120,19 @@ class MovePlanning(Node):
         self.tank_pose_x = msg.position.x
         self.tank_pose_y = msg.position.y
 
-        self.tank_angle = Rotation.from_quat(msg.orientation).as_euler('zyx')[0]
+        self.tank_angle = Rotation.from_quat(msg.orientation).as_euler('zyx', degrees=True)[0]
         print(self.tank_pose_x, self.tank_pose_y, self.tank_angle)
 
     def make_points(self):
 
-        self.positions.update
-        ({
-            "left scan place": [-780,0],
+        self.positions.update = ({
+            "left scan place": [-780, 0],
 
             "right scan place": [780, 0],
 
             "left base 2": [-1225, 0],
 
-            "right base 2": [1225,0],
+            "right base 2": [1225, 0],
 
             "right base 1": [1225, 775],
 
@@ -145,9 +142,8 @@ class MovePlanning(Node):
 
             "left base 1": [-1225, 775],
 
-            "center": [0,0]
+            "center": [0, 0]
         })
-
 
     def path_count(self, aim):
         r = math.sqrt((self.positions[aim][1] + self.tank_pose_y) ** 2 +

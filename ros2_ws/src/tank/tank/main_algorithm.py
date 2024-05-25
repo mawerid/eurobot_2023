@@ -6,8 +6,8 @@ from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Pose
 from std_msgs.msg import String
 
-height = 800
-width = 1500
+height = 1.0
+width = 1.5
 
 
 class MainAlgorithm(Node):
@@ -61,7 +61,7 @@ class MainAlgorithm(Node):
     def pose_callback(self, msg):
         self.pose_x = msg.position.x
         self.pose_y = msg.position.y
-        self.angle = Rotation.from_quat(msg.orientation).as_euler('zyx')[0]
+        self.angle = Rotation.from_quat(msg.orientation).as_euler('zyx', degrees=True)[0]
 
 
 def main(args=None):

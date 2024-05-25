@@ -28,13 +28,13 @@ class AfterStop(Node):
         self.our_robot[0] = 2
         self.our_robot[1] = msg.position.x
         self.our_robot[2] = msg.position.y
-        self.our_robot[3] = Rotation.from_quat(msg.orientation).as_euler('zyx')[0]
+        self.our_robot[3] = Rotation.from_quat(msg.orientation).as_euler('zyx', degrees=True)[0]
 
     def enemy_callback(self, msg):
         self.enemy_robot[0] = 1
         self.enemy_robot[1] = msg.position.x
         self.enemy_robot[2] = msg.position.y
-        self.enemy_robot[3] = Rotation.from_quat(msg.orientation).as_euler('zyx')[0]
+        self.enemy_robot[3] = Rotation.from_quat(msg.orientation).as_euler('zyx', degrees=True)[0]
 
     def act_decision(self, msg):
         if msg.data == "Obstacle, I stopped":
