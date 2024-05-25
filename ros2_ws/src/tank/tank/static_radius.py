@@ -116,13 +116,13 @@ class StaticRadius(Node):
             rvec_1, tvec_1, _ = cv2.aruco.estimatePoseSingleMarkers(marker_1, 0.05, matrix_coefficients,
                                                                     distortion_coefficients)
             rot_mat = Rotation.from_rotvec(rvec_1[0]).as_matrix()
-            tf_robo = np.array([[rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], tvec_1[0]],
-                                [rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], tvec_1[1]],
-                                [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_1[2]],
+            tf_robo = np.array([[rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], tvec_1[0][0][0]],
+                                [rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], tvec_1[0][0][1]],
+                                [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_1[0][0][2]],
                                 [0.0, 0.0, 0.0, 1.0]])
 
             tf_new = np.matmul(tf_robo, self.transform_cam2center)
-            R = Rotation.from_matrix(tf_new[:3, :3]).as_quat(canonical=True)
+            R = Rotation.from_matrix(tf_new[:3, :3]).as_quat()
             tvec_1 = tf_new[:3, 3]
 
             # Create Pose message
@@ -142,13 +142,13 @@ class StaticRadius(Node):
                                                                     distortion_coefficients)
 
             rot_mat = Rotation.from_rotvec(rvec_2[0]).as_matrix()
-            tf_robo = np.array([[rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], tvec_2[0]],
-                                [rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], tvec_2[1]],
-                                [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_2[2]],
+            tf_robo = np.array([[rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], tvec_2[0][0][0]],
+                                [rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], tvec_2[0][0][1]],
+                                [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_2[0][0][2]],
                                 [0.0, 0.0, 0.0, 1.0]])
 
             tf_new = np.matmul(tf_robo, self.transform_cam2center)
-            R = Rotation.from_matrix(tf_new[:3, :3]).as_quat(canonical=True)
+            R = Rotation.from_matrix(tf_new[:3, :3]).as_quat()
             tvec_2 = tf_new[:3, 3]
 
             # Create Pose message
@@ -176,7 +176,8 @@ class StaticRadius(Node):
                 self.obstacle.publish(obst)
             print(tvec_2)
 
-        if all(map_markers) and not self.message_displayed:
+        if map_markers[0] is not None and map_markers[1] is not None and map_markers[2] is not None and map_markers[
+            3] is not None and not self.message_displayed:
             self.all_markers_detected = True
             pose_msg = String()
             # print("All markers detected:", self.all_markers_detected)
