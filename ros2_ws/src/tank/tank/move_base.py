@@ -137,17 +137,17 @@ class MoveBase(Node):
         dif_angle = msg.y + self.angle_z  # self.imu_info + self.imu_correct
         if self.permit == 'move':
             if msg.x > 0.1:
-                hside = max(abs(-self.pose_y - self.up), abs(-self.pose_y - self.down))
-                vside = max(abs(self.pose_x - self.left), abs(self.right - self.left))
-                if (msg.x > hside) and (msg.y >= 0) and (msg.y <= 180):
-                    self.make_command(dif_angle=dif_angle - 180)
-                elif (msg.x > hside) and (msg.y >= -180) and (msg.y < 0):
-                    self.make_command(dif_angle=dif_angle + 180)
-                elif (msg.x > vside) and (msg.y >= 90) and (msg.y <= 180):
-                    self.make_command(dif_angle=dif_angle - 180)
-                elif (msg.x > vside) and (msg.y >= -180) and (msg.y <= -90):
-                    self.make_command(dif_angle=dif_angle + 180)
-                else:
+                #hside = max(abs(-self.pose_y - self.up), abs(-self.pose_y - self.down))
+                #vside = max(abs(self.pose_x - self.left), abs(self.right - self.left))
+                #if (msg.x > hside) and (msg.y >= 0) and (msg.y <= 180):
+                   # self.make_command(dif_angle=dif_angle - 180)
+                #elif (msg.x > hside) and (msg.y >= -180) and (msg.y < 0):
+                   # self.make_command(dif_angle=dif_angle + 180)
+                #elif (msg.x > vside) and (msg.y >= 90) and (msg.y <= 180):
+                   # self.make_command(dif_angle=dif_angle - 180)
+                #elif (msg.x > vside) and (msg.y >= -180) and (msg.y <= -90):
+                    #self.make_command(dif_angle=dif_angle + 180)
+                #else:
                     self.make_command(dif_angle=dif_angle)
             else:
                 self.stop_wheel()
