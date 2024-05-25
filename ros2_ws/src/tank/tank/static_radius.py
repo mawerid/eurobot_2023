@@ -115,10 +115,10 @@ class StaticRadius(Node):
         if marker_1 is not None:
             rvec_1, tvec_1, _ = cv2.aruco.estimatePoseSingleMarkers(marker_1, 0.05, matrix_coefficients,
                                                                     distortion_coefficients)
-            rot_mat = Rotation.from_rotvec(rvec_1).as_matrix()
-            tf_robo = np.array([[rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], tvec_1[0][0][0]],
-                                [rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], tvec_1[0][0][1]],
-                                [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_1[0][0][2]],
+            rot_mat = Rotation.from_rotvec(rvec_1[0]).as_matrix()
+            tf_robo = np.array([[rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], tvec_1[0][0]],
+                                [rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], tvec_1[0][1]],
+                                [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_1[0][2]],
                                 [0.0, 0.0, 0.0, 1.0]])
 
             tf_new = np.matmul(tf_robo, self.transform_cam2center)
@@ -141,10 +141,10 @@ class StaticRadius(Node):
             rvec_2, tvec_2, _ = cv2.aruco.estimatePoseSingleMarkers(marker_2, 0.05, matrix_coefficients,
                                                                     distortion_coefficients)
 
-            rot_mat = Rotation.from_rotvec(rvec_2).as_matrix()
-            tf_robo = np.array([[rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], tvec_2[0][0][0]],
-                                [rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], tvec_2[0][0][1]],
-                                [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_2[0][0][2]],
+            rot_mat = Rotation.from_rotvec(rvec_2[0]).as_matrix()
+            tf_robo = np.array([[rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], tvec_2[0][0]],
+                                [rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], tvec_2[0][1]],
+                                [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_2[0][2]],
                                 [0.0, 0.0, 0.0, 1.0]])
 
             tf_new = np.matmul(tf_robo, self.transform_cam2center)
