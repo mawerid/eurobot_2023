@@ -121,7 +121,8 @@ class ArucoMapper(Node):
         ret, frame = self.cap.read()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        corners, ids, _ = cv2.aruco.detectMarkers(gray, self.arucoDict, parameters=self.arucoParams)
+        detector = cv2.aruco.ArucoDetector(self.arucoDict, self.arucoParams)
+        corners, ids, _ = detector.detectMarkers(gray)
 
         robot_marker = None
         enemy_marker = None

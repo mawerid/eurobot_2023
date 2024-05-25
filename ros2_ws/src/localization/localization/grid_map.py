@@ -75,7 +75,7 @@ class OccupancyGridGenerator(Node):
         self.gridmap.header.frame_id = 'camera_link'  # Adjust frame_id if needed
         self.gridmap.info.resolution = self.cell_size
         self.gridmap.info.width = gridmap_width
-        self.gridmap.info.height = gridmap_height
+        self.gridmap.info.HEIGHT = gridmap_height
         self.gridmap.info.origin.position.x = origin_x
         self.gridmap.info.origin.position.y = origin_y
 

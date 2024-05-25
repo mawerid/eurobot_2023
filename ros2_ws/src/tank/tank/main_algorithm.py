@@ -7,8 +7,10 @@ from geometry_msgs.msg import Pose
 from std_msgs.msg import String
 import numpy as np
 
-height = 1.0
-width = 1.5
+HEIGHT = 1.0
+WIDTH = 1.5
+
+TIMER_PERIOD = 0.2
 
 
 class MainAlgorithm(Node):
@@ -18,8 +20,7 @@ class MainAlgorithm(Node):
         self.response_listener = self.create_subscription(String, 'main_response_topic', self.action, 10)
         self.commander = self.create_publisher(String, 'main_command_topic', 10)
         self.robot_place = self.create_subscription(Pose, 'robot_place', self.pose_callback, 10)
-        timer_period = 0.2
-        self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.timer = self.create_timer(TIMER_PERIOD, self.timer_callback)
         self.command = ""
         self.pose_x = 0.0
         self.pose_y = 0.0
@@ -43,26 +44,29 @@ class MainAlgorithm(Node):
                 com.data = "to_left_base_1"
                 self.command = "to_left_base_1"
                 self.commander.publish(com)
-            #case "I moved to aim":
-                #self.command = None
-                #if self.plants_on_board is not True:
-                 #   com = String()
-                  #  com.data = ""
-                    # else:
-                #   com =
-            #case None:
-               # print('I am waiting static markers')
+            # case "I moved to aim":
+            # self.command = None
+            # if self.plants_on_board is not True:
+            #   com = String()
+            #  com.data = ""
+            # else:
+            #   com =
+            # case None:
+            # print('I am waiting static markers')
 
     def timer_callback(self):
         msg = String()
         msg.data = self.command
-        #self.get_logger().info('Distance "%s"' % self.command)
+        # self.get_logger().info('Distance "%s"' % self.command)
         self.commander.publish(msg)
 
     def pose_callback(self, msg):
         self.pose_x = msg.position.x
         self.pose_y = msg.position.y
-        self.angle = Rotation.from_quat(np.array([msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w])).as_euler('zyx', degrees=True)[0]
+        self.angle = Rotation.from_quat(
+            np.array([msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w])).as_euler('zyx',
+                                                                                                             degrees=True)[
+            0]
 
 
 def main(args=None):

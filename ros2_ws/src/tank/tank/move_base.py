@@ -8,8 +8,11 @@ from std_msgs.msg import String
 from std_msgs.msg import Float64
 import numpy as np
 
-height = 1
-width = 1.5
+HEIGHT = 1
+WIDTH = 1.5
+ROTATION_SPEED = 1.9
+LINEAR_SPEED = 0.35
+MIN_RADIAL_ANGLE = 0.1
 
 
 class MoveBase(Node):
@@ -28,13 +31,13 @@ class MoveBase(Node):
         self.imu_info = 0
         self.imu_correct = 0
         self.vel = Twist()
-        self.up = height
-        self.down = -height
-        self.right = width
-        self.left = -width
+        self.up = HEIGHT
+        self.down = -HEIGHT
+        self.right = WIDTH
+        self.left = -WIDTH
         self.pose_x = 0
         self.pose_y = 0
-        self.angle_z = 0
+        self.angle = 0
 
     def listener_imu(self, msg):
         self.imu_info = float(msg.angular_velocity.z)
@@ -49,11 +52,14 @@ class MoveBase(Node):
     def pose_callback(self, msg):
         self.pose_x = msg.position.x
         self.pose_y = msg.position.y
-        self.angle_z = Rotation.from_quat(np.array([msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w])).as_euler('zyx', degrees=True)[0]
+        self.angle = Rotation.from_quat(
+            np.array([msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w])).as_euler('zyx',
+                                                                                                             degrees=True)[
+            0]
 
     def scan_callback(self, msg):
         if msg.data == 'rotate':
-            if self.pose_x > width / 2:
+            if self.pose_x > WIDTH / 2:
                 self.rotate(dim='overwise')
             else:
                 self.rotate(dim='clockwise')
@@ -61,40 +67,29 @@ class MoveBase(Node):
             self.stop_wheel()
 
     def rotate(self, dim):
-        if dim == 'clockwise':
-            self.vel.linear.x = 0.0
-            self.vel.linear.y = 0.0
-            self.vel.angular.z = 1.9
-            self.wheel_publisher.publish(self.vel)
-        else:
-            self.vel.linear.x = 0.0
-            self.vel.linear.y = 0.0
-            self.vel.angular.z = -1.9
-            self.wheel_publisher.publish(self.vel)
+        direction = -1.0
+        if dim == 'overwise':
+            direction *= direction
+
+        self.vel.linear.x = 0.0
+        self.vel.linear.y = 0.0
+        self.vel.angular.z = ROTATION_SPEED
+        self.wheel_publisher.publish(self.vel)
 
     def go_straight(self, dim, axe):
-        if dim == 'forward':
-            if axe == 'x':
-                self.vel.linear.x = 0.35
-                self.vel.linear.y = 0.0
-                self.vel.angular.z = 0.0
-                self.wheel_publisher.publish(self.vel)
-            else:
-                self.vel.linear.x = 0.0
-                self.vel.linear.y = 0.35
-                self.vel.angular.z = 0.0
-                self.wheel_publisher.publish(self.vel)
+        direction = -1.0
+        if dim == 'backward':
+            direction *= direction
+        if axe == 'x':
+            self.vel.linear.x = LINEAR_SPEED
+            self.vel.linear.y = 0.0
+            self.vel.angular.z = 0.0
+            self.wheel_publisher.publish(self.vel)
         else:
-            if axe == 'x':
-                self.vel.linear.x = -0.35
-                self.vel.linear.y = 0.0
-                self.vel.angular.z = 0.0
-                self.wheel_publisher.publish(self.vel)
-            else:
-                self.vel.linear.x = 0.0
-                self.vel.linear.y = -0.35
-                self.vel.angular.z = 0.0
-                self.wheel_publisher.publish(self.vel)
+            self.vel.linear.x = 0.0
+            self.vel.linear.y = LINEAR_SPEED
+            self.vel.angular.z = 0.0
+            self.wheel_publisher.publish(self.vel)
 
     def stop_wheel(self):
         self.vel.linear.x = 0.0
@@ -135,9 +130,9 @@ class MoveBase(Node):
                 self.go_straight(dim='backward', axe='y')
 
     def action(self, msg):
-        dif_angle = msg.y + self.angle_z  # self.imu_info + self.imu_correct
+        dif_angle = msg.y + self.angle  # self.imu_info + self.imu_correct
         if self.permit == 'move':
-            if msg.x > 0.1:
+            if msg.x > MIN_RADIAL_ANGLE:
                 hside = max(abs(-self.pose_y - self.up), abs(-self.pose_y - self.down))
                 vside = max(abs(self.pose_x - self.left), abs(self.right - self.left))
                 if (msg.x > hside) and (msg.y >= 0) and (msg.y <= 180):

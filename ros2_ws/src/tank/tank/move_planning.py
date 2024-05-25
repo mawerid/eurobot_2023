@@ -12,28 +12,27 @@ class MovePlanning(Node):
     def __init__(self):
         super().__init__('move_planning')
         self.command_listener = self.create_subscription(String, 'main_command_topic', self.act_decision, 10)
-        self.static_aruco_sub = self.create_subscription(String, 'static_aruco', self.static_aruco_info, 10)
         self.robot_place = self.create_subscription(Pose, 'robot_place', self.pose_callback, 10)
         self.info_from_mv = self.create_subscription(String, 'mv_base_resp', self.response_callback, 10)
         self.planner_response = self.create_publisher(String, 'main_response_topic', 10)
         self.aim_planner = self.create_publisher(Vector3, 'aim_topic', 10)
-        self.tank_pose_x = 0.0
-        self.tank_pose_y = 0.0
-        self.tank_angle = 0.0
-        self.count = 0
+        self.pose_x = 0.0
+        self.pose_y = 0.0
+        self.angle = 0.0
         self.aim = "no aim"
-        self.static_aruco_dict = {20: [0, 0], 21: [0, 0], 22: [0, 0], 23: [0, 0]}
+        self.task_condition = ""
         self.positions = {
-            "left base 1": [0, 0],
-            "left base 2": [0, 0],
-            "left base 3": [0, 0],
-            "right base 1": [0, 0],
-            "right base 2": [0, 0],
-            "right base 3": [0, 0],
-            "center": [0, 0],
-            "left scan place": [0, 0],
-            "right scan place": [0, 0]
+            "left scan place": [-780, 0],
+            "right scan place": [780, 0],
+            "left base 2": [-1225, 0],
+            "right base 2": [1225, 0],
+            "right base 1": [1225, 775],
+            "left base 3": [-1225, -775],
+            "right base 3": [1225, -775],
+            "left base 1": [-1225, 775],
+            "center": [0, 0]
         }
+        self.start_pose = False
 
     def act_decision(self, msg):
         ans = String()
@@ -97,12 +96,6 @@ class MovePlanning(Node):
                 self.get_logger().info('I am "%s"' % ans.data)
                 # self.planner_response.publish(ans)
 
-    def static_aruco_info(self, msg):
-        if msg.data == "map_done":
-            ans = String()
-            ans.data = "map_done"
-            self.planner_response.publish(ans)
-
     def response_callback(self, msg):
         self.task_condition = msg.data
         resp = String()
@@ -118,42 +111,26 @@ class MovePlanning(Node):
                 self.planner_response.publish(resp)
 
     def pose_callback(self, msg):
-        self.tank_pose_x = msg.position.x
-        self.tank_pose_y = msg.position.y
+        if not self.start_pose:
+            ans = String()
+            ans.data = "map_done"
+            self.planner_response.publish(ans)
+            self.start_pose = True
 
-        self.tank_angle = Rotation.from_quat(
+        self.pose_x = msg.position.x
+        self.pose_y = msg.position.y
+        self.angle = Rotation.from_quat(
             np.array([msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w])).as_euler('zyx',
                                                                                                              degrees=True)[
             0]
-        print(self.tank_pose_x, self.tank_pose_y, self.tank_angle)
 
-    def make_points(self):
-
-        self.positions.update = ({
-            "left scan place": [-780, 0],
-
-            "right scan place": [780, 0],
-
-            "left base 2": [-1225, 0],
-
-            "right base 2": [1225, 0],
-
-            "right base 1": [1225, 775],
-
-            "left base 3": [-1225, -775],
-
-            "right base 3": [1225, -775],
-
-            "left base 1": [-1225, 775],
-
-            "center": [0, 0]
-        })
+        print(self.pose_x, self.pose_y, self.angle)
 
     def path_count(self, aim):
-        r = math.sqrt((self.positions[aim][1] - self.tank_pose_y) ** 2 +
-                      (self.positions[aim][0] - self.tank_pose_x) ** 2)
-        phi = math.atan2(self.positions[aim][1] - self.tank_pose_y,
-                         self.positions[aim][0] - self.tank_pose_x)
+        r = math.sqrt((self.positions[aim][1] - self.pose_y) ** 2 +
+                      (self.positions[aim][0] - self.pose_x) ** 2)
+        phi = math.atan2(self.positions[aim][1] - self.pose_y,
+                         self.positions[aim][0] - self.pose_x)
         msg = Vector3()
         msg.x = r
         msg.y = phi * 180 / math.pi
