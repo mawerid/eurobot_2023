@@ -15,8 +15,10 @@ ROBOT_MARKER = 2
 ENEMY_MARKER = 1
 
 MIN_DISTANCE = 0.6
-MAP_MARKER_LENGTH = 0.7
-ROBOT_MARKER_LENGTH = 0.7
+MAP_MARKER_LENGTH = 0.07
+ROBOT_MARKER_LENGTH = 0.07
+
+DISTANCE_BUFFER_SIZE = 10
 
 
 class ArucoMapper(Node):
@@ -67,6 +69,8 @@ class ArucoMapper(Node):
         self.tfs_map_markers = [None for _ in range(MAP_MARKERS_COUNT)]
         self.map_build_flag = False
 
+        self.current_distance = np.zeros((1, DISTANCE_BUFFER_SIZE))
+
     def calc_center(self):
 
         av_rotmat = np.zeros((3, 3))
@@ -83,12 +87,12 @@ class ArucoMapper(Node):
         self.tf_cam2center[:3, 3] = av_tvec
         self.tf_cam2center[3, 3] = 1.0
 
-        reverse = np.array([[-1, 0, 0, 0],
-                            [0, 1, 0, 0],
-                            [0, 0, 1, 0],
-                            [0, 0, 0, 1]])
-
-        self.tf_cam2center = np.matmul(reverse, self.tf_cam2center)
+        # reverse = np.array([[-1, 0, 0, 0],
+        #                     [0, 1, 0, 0],
+        #                     [0, 0, 1, 0],
+        #                     [0, 0, 0, 1]])
+        #
+        # self.tf_cam2center = np.matmul(reverse, self.tf_cam2center)
 
     def calc_tf(self, marker):
         rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(marker, ROBOT_MARKER_LENGTH,
@@ -104,6 +108,8 @@ class ArucoMapper(Node):
         tf_robo = np.matmul(self.tf_cam2center, tf_robo)
         R = Rotation.from_matrix(tf_robo[:3, :3]).as_quat()
         tvec = tf_robo[:3, 3]
+
+        print(tvec)
 
         # Create Pose message
         pose_msg = Pose()
