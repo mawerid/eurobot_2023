@@ -52,6 +52,7 @@ class ArucoMapper(Node):
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 3840)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 2160)
 
+        self.static_aruco = self.create_publisher(String, 'static_aruco', 10)
         self.robo_place = self.create_publisher(Pose, 'robot_place', 10)
         self.enemy_place = self.create_publisher(Pose, 'enemy_place', 10)
         self.obstacle = self.create_publisher(String, 'obstacle_info', 10)
@@ -64,6 +65,9 @@ class ArucoMapper(Node):
 
     def image_callback(self):
         ret, img = self.cap.read()
+
+        # annotated_frame = pose_estimation(frame, ARUCO_DICT[aruco_type], cameraMatrix, distCoeffs)
+        # cv2.imshow('Annotated Frame', annotated_frame)
         self.pose_estimation(img, self.aruco_dict[self.aruco_type], self.intrinsic_camera, self.distortion)
 
     def calc_center(self):
@@ -101,6 +105,9 @@ class ArucoMapper(Node):
         marker_2 = None
         map_corners = [None for _ in range(MAP_MARKERS_COUNT)]
         tvec_1, tvec_2 = None, None
+        map_corners = [None, None, None, None]
+
+        tf_robo_1, tf_robo_2 = np.zeros((4, 4)), np.zeros((4, 4))
 
         if len(corners) > 0:
             for i in range(len(ids)):
@@ -134,22 +141,25 @@ class ArucoMapper(Node):
                 self.tfs_map_markers[i] = [rvec, tvec]
 
             self.calc_center()
-            pose_msg.data = "Map done"
+            pose_msg.data = "map_done"
             self.static_aruco.publish(pose_msg)
             self.message_displayed = True
 
         if marker_1 is not None:
             rvec_1, tvec_1, _ = cv2.aruco.estimatePoseSingleMarkers(marker_1, 0.07, matrix_coefficients,
                                                                     distortion_coefficients)
-            rot_mat = Rotation.from_rotvec(rvec_1[0]).as_matrix()
-            tf_robo = np.array([[rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], tvec_1[0][0]],
-                                [rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], tvec_1[0][1]],
-                                [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_1[0][2]],
+            rot_mat = Rotation.from_rotvec(rvec_1[0]).as_matrix()[0]
+            tf_robo = np.array([[rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], tvec_1[0][0][0]],
+                                [rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], tvec_1[0][0][1]],
+                                [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_1[0][0][2]],
                                 [0.0, 0.0, 0.0, 1.0]])
 
             tf_new = np.matmul(self.tf_cam2center, tf_robo)
             R = Rotation.from_matrix(tf_new[:3, :3]).as_quat()
             tvec_1 = tf_new[:3, 3]
+            tf_robo_1 = np.matmul(self.transform_cam2center, tf_robo)
+            R = Rotation.from_matrix(tf_robo_1[:3, :3]).as_quat()
+            tvec_1 = tf_robo_1[:3, 3]
 
             # Create Pose message
             pose_msg = Pose()
@@ -167,12 +177,15 @@ class ArucoMapper(Node):
             rvec_2, tvec_2, _ = cv2.aruco.estimatePoseSingleMarkers(marker_2, 0.07, matrix_coefficients,
                                                                     distortion_coefficients)
 
-            rot_mat = Rotation.from_rotvec(rvec_2[0]).as_matrix()
-            tf_robo = np.array([[rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], tvec_2[0][0]],
-                                [rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], tvec_2[0][1]],
-                                [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_2[0][2]],
+            rot_mat = Rotation.from_rotvec(rvec_2[0]).as_matrix()[0]
+            tf_robo = np.array([[rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], tvec_2[0][0][0]],
+                                [rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], tvec_2[0][0][1]],
+                                [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_2[0][0][2]],
                                 [0.0, 0.0, 0.0, 1.0]])
 
+            tf_robo_2 = np.matmul(self.transform_cam2center, tf_robo)
+            R = Rotation.from_matrix(tf_robo_2[:3, :3]).as_quat()
+            tvec_2 = tf_robo_2[:3, 3]
             tf_new = np.matmul(self.tf_cam2center, tf_robo)
             R = Rotation.from_matrix(tf_new[:3, :3]).as_quat()
             tvec_2 = tf_new[:3, 3]
@@ -189,9 +202,12 @@ class ArucoMapper(Node):
 
             self.robo_place.publish(pose_msg)
 
-        if tvec_1.sum() >= 0 and tvec_2.sum() >= 0:
-            distance = np.linalg.norm(tvec_1 - tvec_2)
-            # print(distance)
+        if marker_1 is not None and marker_2 is not None and self.message_displayed:
+
+            new = tf_robo_1 * np.linalg.inv(tf_robo_2)
+
+            distance = np.linalg.norm(new[:3, 3])
+            print(distance)
 
             obst = String()
             if distance < 0.6:
@@ -200,7 +216,7 @@ class ArucoMapper(Node):
             elif distance >= 0.6:
                 obst.data = "move"
                 self.obstacle.publish(obst)
-            print(tvec_2)
+            # print(tvec_2)
 
 
 def main(args=None):
