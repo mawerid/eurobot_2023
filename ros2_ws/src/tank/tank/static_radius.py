@@ -67,12 +67,12 @@ class StaticRadius(Node):
 
     def calc_center(self):
 
-        av_rvec = np.array([0.0, 0.0, 0.0])
-        av_tvec = np.array([0.0, 0.0, 0.0])
+        av_rvec = np.array([[0.0, 0.0, 0.0]])
+        av_tvec = np.array([[0.0, 0.0, 0.0]])
 
         for i in range(4):
-            av_rvec += self.map_markers[i][0]
-            av_tvec += self.map_markers[i][1]
+            av_rvec += self.map_markers[i][0][0]
+            av_tvec += self.map_markers[i][1][0]
 
         av_rvec /= 4
         av_tvec /= 4
@@ -80,6 +80,7 @@ class StaticRadius(Node):
         rot_mat = Rotation.from_rotvec(av_rvec).as_matrix()
         self.transform_cam2center[:3, :3] = rot_mat
         self.transform_cam2center[:3, 3] = av_tvec
+        self.transform_cam2center[3, 3] = 1.0
 
     def pose_estimation(self, frame, aruco_dict_type, matrix_coefficients, distortion_coefficients):
 
@@ -92,6 +93,8 @@ class StaticRadius(Node):
         marker_1 = None
         marker_2 = None
         map_markers = [None, None, None, None]
+
+        print(self.transform_cam2center)
 
         tvec_1, tvec_2 = np.array([-1., -1., -1.]), np.array([-1., -1., -1.])
 
@@ -121,15 +124,15 @@ class StaticRadius(Node):
                                 [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_1[0][0][2]],
                                 [0.0, 0.0, 0.0, 1.0]])
 
-            tf_new = np.matmul(tf_robo, self.transform_cam2center)
+            tf_new = np.matmul(self.transform_cam2center, tf_robo)
             R = Rotation.from_matrix(tf_new[:3, :3]).as_quat()
             tvec_1 = tf_new[:3, 3]
 
             # Create Pose message
             pose_msg = Pose()
-            pose_msg.position.x = tvec_1[0]
-            pose_msg.position.y = tvec_1[1]
-            pose_msg.position.z = tvec_1[2]
+            pose_msg.position.x = tvec_1[0] / 100
+            pose_msg.position.y = tvec_1[1] / 100
+            pose_msg.position.z = tvec_1[2] / 100
             pose_msg.orientation.x = R[0]
             pose_msg.orientation.y = R[1]
             pose_msg.orientation.z = R[2]
@@ -147,15 +150,15 @@ class StaticRadius(Node):
                                 [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec_2[0][0][2]],
                                 [0.0, 0.0, 0.0, 1.0]])
 
-            tf_new = np.matmul(tf_robo, self.transform_cam2center)
+            tf_new = np.matmul(self.transform_cam2center, tf_robo)
             R = Rotation.from_matrix(tf_new[:3, :3]).as_quat()
             tvec_2 = tf_new[:3, 3]
 
             # Create Pose message
             pose_msg = Pose()
-            pose_msg.position.x = tvec_2[0]
-            pose_msg.position.y = tvec_2[1]
-            pose_msg.position.z = tvec_2[2]
+            pose_msg.position.x = tvec_2[0] / 100
+            pose_msg.position.y = tvec_2[1] / 100
+            pose_msg.position.z = tvec_2[2] / 100
             pose_msg.orientation.x = R[0]
             pose_msg.orientation.y = R[1]
             pose_msg.orientation.z = R[2]
