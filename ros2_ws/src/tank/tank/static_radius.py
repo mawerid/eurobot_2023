@@ -157,6 +157,10 @@ class ArucoMapper(Node):
                 self.tfs_map_markers[i] = [rvec[0][0], tvec[0]]
 
             self.calc_center()
+            rvec = Rotation.from_matrix(self.tf_cam2center[:3, :3]).as_rotvec()
+            tvec = self.tf_cam2center[:3, 3]
+            cv2.drawFrameAxes(frame, self.intrinsic_camera, self.distortion, rvec, tvec, 0.1)
+            cv2.imwrite("map.png", frame)
 
             self.map_build_flag = True
 
