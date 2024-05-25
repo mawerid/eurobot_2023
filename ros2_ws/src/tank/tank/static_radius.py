@@ -101,7 +101,7 @@ class ArucoMapper(Node):
                             [rot_mat[2][0], rot_mat[2][1], rot_mat[2][2], tvec[0][0][2]],
                             [0.0, 0.0, 0.0, 1.0]])
 
-        tf_robo = np.matmul(self.transform_cam2center, tf_robo)
+        tf_robo = np.matmul(self.tf_cam2center, tf_robo)
         R = Rotation.from_matrix(tf_robo[:3, :3]).as_quat()
         tvec = tf_robo[:3, 3]
 
