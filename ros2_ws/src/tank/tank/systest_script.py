@@ -22,12 +22,11 @@ class Systest_script(Node):
         self.subscriptions
         timer_period = 3  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
-        self.i = 0 
+        self.i = 0
         self.vel = Twist()
         self.drum = Vector3()
         self.servo = Vector3()
         self.elevat = Vector3()
-
 
     def timer_callback(self):
         if self.i == 0:
@@ -42,7 +41,7 @@ class Systest_script(Node):
             self.vel.linear.x = 0.35
             self.vel.linear.y = 0.0
             self.vel.angular.z = 0.0
-            self.wheel_publisher.publish(self.vel)            
+            self.wheel_publisher.publish(self.vel)
             self.i += 1
         elif self.i >= 2 and self.i < 3:
             if self.i >= 2 and self.i < 2.5:
@@ -51,14 +50,14 @@ class Systest_script(Node):
                 self.vel.linear.y = 0.0
                 self.vel.angular.z = -2.1
                 self.wheel_publisher.publish(self.vel)
-                self.i += 0.5 
+                self.i += 0.5
             elif self.i >= 2.5 and self.i < 3:
                 self.get_logger().info('"rotate overwise" checking')
                 self.vel.linear.x = 0.0
                 self.vel.linear.y = 0.0
                 self.vel.angular.z = 2.1
                 self.wheel_publisher.publish(self.vel)
-                self.i += 0.5 
+                self.i += 0.5
         elif self.i >= 3 and self.i < 4:
             if self.i >= 3 and self.i < 3.5:
                 self.get_logger().info('"drum rotate clockwise" checking')
@@ -105,14 +104,14 @@ class Systest_script(Node):
             self.servo.y = 180.0
             self.servo.z = 0.0
             self.servo_publisher.publish(self.servo)
-            self.i += 1    
+            self.i += 1
         elif self.i == 8:
             self.get_logger().info('"servo 5" checking')
             self.servo.x = 5.0
             self.servo.y = 180.0
             self.servo.z = 0.0
             self.servo_publisher.publish(self.servo)
-            self.i += 1        
+            self.i += 1
         elif self.i == 9:
             self.get_logger().info('"servo 6" checking')
             self.servo.x = 6.0
@@ -137,16 +136,12 @@ class Systest_script(Node):
         elif self.i == 12:
             self.get_logger().info('checking done')
             self.i = 0
-        
-             
-    
+
     def listener_callback(self, msg):
         self.imu_info = float(msg.angular_velocity.z)
         msg = Char()
         msg.data = self.imu_info
         self.screen_publisher.publish(msg)
-
-
 
 
 def main(args=None):

@@ -22,12 +22,11 @@ class Scanner(Node):
         self.start_rotate = 0
         self.plant_count = 0
 
-
     def listener_callback(self, msg):
         self.imu_info = float(msg.angular_velocity.z)
 
     def plant_callback(self, msg):
-        self.plant_dict.update({ msg.x : [msg.y, self.imu_info]})
+        self.plant_dict.update({msg.x: [msg.y, self.imu_info]})
         print(self.plant_dict)
 
     def sort_plant(self):
@@ -66,9 +65,6 @@ class Scanner(Node):
             print("I am waiting ...")
 
 
-
-
-            
 def main(args=None):
     rclpy.init(args=args)
 
